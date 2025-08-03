@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Complete Profile | SahuPost</title>
+    <link rel="icon" type="image/png" href="SahuPost logo.png">
+  <link rel="apple-touch-icon" href="SahuPost logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://unpkg.com/country-list-js@2.0.0/dist/index.min.js"></script>
+  <style>
+    body {
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: white;
+      font-family: 'Orbitron', sans-serif;
+    }
+    .glass {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(20px);
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: 0 0 25px rgba(0, 0, 255, 0.3);
+    }
+    .input-group {
+      position: relative;
+    }
+    .input-floating {
+      border: none;
+      border-bottom: 2px solid white;
+      background: transparent;
+      width: 100%;
+      padding: 1.2rem 0.5rem 0.5rem;
+      color: white;
+      outline: none;
+      transition: 0.3s;
+    }
+    .input-floating:focus {
+      border-color: #00bcd4;
+    }
+    .label-floating {
+      position: absolute;
+      top: 1rem;
+      left: 0.5rem;
+      font-size: 0.875rem;
+      color: #aaa;
+      pointer-events: none;
+      transition: 0.3s;
+    }
+    .input-floating:focus + .label-floating,
+    .input-floating:not(:placeholder-shown) + .label-floating {
+      top: 0;
+      font-size: 0.75rem;
+      color: #00bcd4;
+    }
+    /* Stylish select dropdown */
+select {
+  width: 100%;
+  padding: 10px 15px;
+  font-size: 14px;
+  color: #333;
+  background-color: #000000;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  outline: none;
+  transition: border-color 0.3s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='gray' height='16' viewBox='0 0 24 24' width='16' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+}
+
+.choices__list--dropdown,
+.choices__list[aria-expanded] {
+  background-color: #1f1b2e !important;
+  border: 1px solid #6d28d9 !important;
+  color: white !important;
+  box-shadow: 0 0 10px rgba(168, 129, 255, 0.2);
+}
+
+/* Make hovered items purple */
+.choices__item--selectable.is-highlighted {
+  background-color: #4c1d95 !important;
+  color: white !important;
+}
+
+/* Input inside dropdown should be white text */
+.choices__input--cloned {
+  background-color: transparent !important;
+  color: white !important;
+}
+
+/* Selected value styling */
+.choices__list--single .choices__item {
+  background-color: #1f1b2e !important;
+  color: white !important;
+  border: none !important;
+}
+/* Override Choices.js default to match SahuAI's dark UI */
+.choices {
+  background-color: #1f1b2e;
+  color: white;
+  border: 1px solid #a78bfa;
+  border-radius: 0.5rem;
+}
+
+.choices__inner {
+  background-color: #1f1b2e;
+  color: white;
+  padding: 10px;
+}
+
+.choices__list--dropdown {
+  background-color: #2b2640;
+  color: white;
+  border: 1px solid #a78bfa;
+  border-radius: 0.5rem;
+}
+
+.choices__item--selectable.is-highlighted {
+  background-color: #4c1d95; /* Purple highlight */
+}
+
+.choices__list--single .choices__item {
+  color: white;
+}
+
+/* On focus */
+select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0,123,255,0.2);
+}
+
+/* Style options if needed (browser-dependent) */
+option {
+  padding: 8px;
+  font-size: 14px;
+}
+
+  </style>
+</head>
+<body class="flex justify-center items-center min-h-screen">
+  <div class="glass w-full max-w-xl">
+    <h2 class="text-2xl mb-4 text-center font-bold">Complete Your Profile</h2>
+    <form id="profileForm" class="flex flex-col gap-6">
+      <div class="input-group">
+        <input type="number" id="age" class="input-floating" placeholder=" " required min="1" max="120" />
+        <label for="age" class="label-floating">Age</label>
+      </div>
+      <div class="input-group">
+      <div class="relative w-full">
+  <select id="country"
+    class="peer block w-full appearance-none rounded-md bg-gray-900 text-white border border-gray-700 px-4 pt-6 pb-2 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500">
+    <option value="" disabled selected hidden></option>
+  </select>
+  <label for="country"
+    class="label-floating absolute left-4 top-2 text-sm text-gray-400 transition-all
+           peer-placeholder-shown:top-4 peer-placeholder-shown:text-base
+           peer-placeholder-shown:text-gray-500
+           peer-focus:top-2 peer-focus:text-sm peer-focus:text-purple-400">
+    Country
+  </label>
+
+  <!-- Chevron icon (optional) -->
+  <div class="pointer-events-none absolute inset-y-0 right-3 flex items-center text-gray-400">
+    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2"
+         viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  </div>
+</div>
+
+      <div class="input-group">
+        <textarea id="bio" rows="3" class="input-floating resize-y" placeholder=" "></textarea>
+        <label for="bio" class="label-floating">Bio (Optional)</label>
+      </div>
+      <div class="input-group">
+        <input type="url" id="website" class="input-floating" placeholder=" " />
+        <label for="website" class="label-floating">Website (Optional)</label>
+      </div>
+<!-- Submit Button -->
+<button type="submit"
+  class="w-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-medium py-2 px-4 rounded-md shadow-md hover:shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2">
+  🚀 Let's Go
+</button>
+
+<!-- Error Message -->
+<p id="error" class="mt-2 text-red-400 text-sm text-center font-medium transition-opacity duration-300"></p>
+
+    </form>
+
+    <div id="loader" class="mt-4 hidden text-center">
+      <svg class="animate-spin h-6 w-6 mx-auto text-white" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"></circle>
+        <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8v8H4z" />
+      </svg>
+      <p class="text-sm mt-2">Saving your profile...</p>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD3ccBgd7d4RA2On9G6qJ0bWuH9JHtgCTc",
+      authDomain: "sahupost-92d1a.firebaseapp.com",
+      projectId: "sahupost-92d1a",
+      storageBucket: "sahupost-92d1a.firebasestorage.app",
+      messagingSenderId: "1097651897779",
+      appId: "1:1097651897779:web:94888b6269c438e705f7c6"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const form = document.getElementById("profileForm");
+    const loader = document.getElementById("loader");
+    const errorText = document.getElementById("error");
+    const ageInput = document.getElementById("age");
+    const countrySelect = document.getElementById("country");
+    const bioInput = document.getElementById("bio");
+    const websiteInput = document.getElementById("website");
+
+    // Redirect if not authenticated
+    auth.onAuthStateChanged(async user => {
+      if (!user) {
+        window.location.href = "signup.html";
+      } else {
+        // Pre-fill if data exists
+        const doc = await db.collection("users").doc(user.uid).get();
+        const data = doc.data();
+        if (data) {
+          if (data.age) ageInput.value = data.age;
+          if (data.country) countrySelect.value = data.country;
+          if (data.bio) bioInput.value = data.bio;
+          if (data.website) websiteInput.value = data.website;
+        }
+      }
+    });
+
+const countries = [
+  "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Argentina", "Armenia", "Australia",
+  "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium",
+  "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil",
+  "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Chad",
+  "Chile", "China", "Colombia", "Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic",
+  "Denmark", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Estonia", "Ethiopia", "Fiji",
+  "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Guatemala",
+  "Honduras", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel",
+  "Italy", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kuwait", "Laos", "Latvia",
+  "Lebanon", "Lesotho", "Liberia", "Libya", "Lithuania", "Luxembourg", "Madagascar", "Malawi",
+  "Malaysia", "Maldives", "Mali", "Malta", "Mauritania", "Mexico", "Moldova", "Monaco", "Mongolia",
+  "Morocco", "Mozambique", "Myanmar", "Namibia", "Nepal", "Netherlands", "New Zealand", "Nicaragua",
+  "Niger", "Nigeria", "North Korea", "North Macedonia", "Norway", "Oman", "Pakistan", "Panama",
+  "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania", "Russia", "Rwanda",
+  "Saudi Arabia", "Senegal", "Serbia", "Singapore", "Slovakia", "Slovenia", "Somalia", "South Africa",
+  "South Korea", "Spain", "Sri Lanka", "Sudan", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan",
+  "Tanzania", "Thailand", "Togo", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Uganda",
+  "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan",
+  "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
+];
+
+countries.forEach(country => {
+  const opt = document.createElement("option");
+  opt.value = country;
+  opt.textContent = country;
+  countrySelect.appendChild(opt);
+});
+
+
+    // Submit form
+    form.addEventListener("submit", async e => {
+      e.preventDefault();
+      errorText.textContent = "";
+      loader.classList.remove("hidden");
+
+      const age = parseInt(ageInput.value);
+      const country = countrySelect.value;
+      const bio = bioInput.value.trim();
+      const website = websiteInput.value.trim();
+
+      if (!age || age < 1 || age > 120) {
+        errorText.textContent = "Enter a valid age between 1 and 120.";
+        loader.classList.add("hidden");
+        return;
+      }
+
+      if (!country) {
+        errorText.textContent = "Please select your country.";
+        loader.classList.add("hidden");
+        return;
+      }
+
+      const bannedWords = ["idiot", "hate", "kill", "stupid"];
+      for (const word of bannedWords) {
+        if (bio.toLowerCase().includes(word)) {
+          errorText.textContent = "Please avoid using inappropriate words in bio.";
+          loader.classList.add("hidden");
+          return;
+        }
+      }
+
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+
+        await db.collection("users").doc(user.uid).update({
+          age,
+          country,
+          bio,
+          website,
+          completedProfile: true,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        window.location.href = "main.html";
+      } catch (err) {
+        errorText.textContent = err.message;
+        loader.classList.add("hidden");
+      }
+    });
+  </script>
+</body>
+</html>

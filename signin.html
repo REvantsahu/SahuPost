@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign In | SahuPost</title>
+    <link rel="icon" type="image/png" href="SahuPost logo.png">
+  <link rel="apple-touch-icon" href="SahuPost logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-950 text-white flex items-center justify-center min-h-screen">
+  <div class="max-w-md w-full p-6 bg-gray-900 rounded-xl shadow-md space-y-6">
+    <h2 class="text-2xl font-semibold text-white text-center">Sign In</h2>
+
+    <!-- Email -->
+    <div class="relative w-full">
+      <input type="email" id="email" required placeholder=" "
+        class="peer block w-full rounded-md bg-gray-800 text-white border border-gray-700 px-4 pt-6 pb-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+      <label for="email"
+        class="absolute left-4 top-2 text-sm text-gray-400 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-2 peer-focus:text-sm peer-focus:text-purple-400">
+        Email
+      </label>
+    </div>
+
+    <!-- Password -->
+    <div class="relative w-full">
+      <input type="password" id="password" required placeholder=" "
+        class="peer block w-full rounded-md bg-gray-800 text-white border border-gray-700 px-4 pt-6 pb-2 focus:outline-none focus:ring-2 focus:ring-purple-500" />
+      <label for="password"
+        class="absolute left-4 top-2 text-sm text-gray-400 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-2 peer-focus:text-sm peer-focus:text-purple-400">
+        Password
+      </label>
+      <button type="button" id="togglePassword" class="absolute right-4 bottom-2 text-sm text-purple-400">Show</button>
+    </div>
+
+    <!-- Error Message -->
+    <p id="error" class="text-red-400 text-sm text-center font-medium transition-opacity duration-300"></p>
+
+    <!-- Sign In Button -->
+    <button id="signInBtn"
+      class="w-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-medium py-2 px-4 rounded-md shadow-md hover:shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2">
+      🔐 Sign In
+    </button>
+
+    <!-- Google Sign-In -->
+    <button id="googleBtn"
+      class="w-full bg-white text-black font-medium py-2 px-4 rounded-md shadow-md hover:shadow-lg flex items-center justify-center gap-2 transition-all duration-300">
+      <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" class="w-5 h-5" />
+      Continue with Google
+    </button>
+
+    <!-- Links -->
+    <div class="text-sm text-center text-gray-400 space-y-1">
+      <a href="signup.html" class="hover:text-white underline">New here? Sign up</a><br>
+      <a href="forgot-password.html" class="hover:text-white underline">Forgot password?</a>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth,
+      signInWithEmailAndPassword,
+      signInWithPopup,
+      GoogleAuthProvider
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyD3ccBgd7d4RA2On9G6qJ0bWuH9JHtgCTc",
+      authDomain: "sahupost-92d1a.firebaseapp.com",
+      projectId: "sahupost-92d1a",
+      storageBucket: "sahupost-92d1a.firebasestorage.app",
+      messagingSenderId: "1097651897779",
+      appId: "1:1097651897779:web:94888b6269c438e705f7c6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const errorEl = document.getElementById("error");
+
+    // Email & Password Sign-In
+    document.getElementById("signInBtn").addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+      errorEl.textContent = "";
+
+      if (!email || !password) {
+        errorEl.textContent = "Please enter both email and password.";
+        return;
+      }
+
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        window.location.href = "main.html"; // Redirect after success
+      } catch (error) {
+        if (error.code === "auth/invalid-email") {
+          errorEl.textContent = "Invalid email format.";
+        } else if (error.code === "auth/user-not-found") {
+          errorEl.textContent = "No user found with this email.";
+        } else if (error.code === "auth/wrong-password") {
+          errorEl.textContent = "Wrong password.";
+        } else {
+          errorEl.textContent = error.message;
+        }
+      }
+    });
+
+    // Google Sign-In
+    document.getElementById("googleBtn").addEventListener("click", async () => {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const isNew = result._tokenResponse?.isNewUser;
+
+        if (isNew) {
+          window.location.href = "complete-profile.html"; // Signup flow
+        } else {
+          window.location.href = "main.html"; // Login flow
+        }
+      } catch (err) {
+        errorEl.textContent = "Google sign-in failed.";
+        console.error(err);
+      }
+    });
+
+    // Show/Hide Password
+    document.getElementById("togglePassword").addEventListener("click", () => {
+      const type = passwordInput.type === "password" ? "text" : "password";
+      passwordInput.type = type;
+      document.getElementById("togglePassword").textContent = type === "password" ? "Show" : "Hide";
+    });
+  </script>
+</body>
+</html>

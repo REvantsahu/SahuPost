@@ -1,0 +1,2018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SahuPost - Main</title>
+    <link rel="icon" type="image/png" href="SahuPost logo.png">
+  <link rel="apple-touch-icon" href="SahuPost logo.png">
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(to bottom right, rgba(0, 0, 64, 0.25), rgba(80, 0, 90, 0.25)), #000;
+    color: #e0e0e0;
+    background-attachment: fixed;
+  }
+#sidebar-toggle-btn {
+  position: fixed;
+  top: 25px;
+  left: 15px;
+  z-index: 10000;
+  background: linear-gradient(135deg, #8e2de2, #4a00e0);
+  color: white;
+  font-size: 24px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(98, 0, 255, 0.6);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+#sidebar-toggle-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(98, 0, 255, 0.8);
+}
+
+
+
+  .header {
+    display: flex;
+    align-items: center;
+    padding: 12px 20px;
+    background: rgba(20, 20, 40, 0.6);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: #d0aaff;
+    font-weight: bold;
+  }
+
+  .logo {
+    position: relative;
+    left: 53px;
+    height: 40px;
+    margin-right: 15px;
+  }
+
+  .container {
+    display: flex;
+    padding: 20px;
+  }
+
+  .user-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+  margin-bottom: 10px;
+  transition: transform 0.2s ease;
+}
+
+.user-card:hover {
+  transform: scale(1.03);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+  .left-sidebar, .right-sidebar {
+   
+    padding: 15px;
+    background: rgba(30, 30, 60, 0.2);
+    border-radius: 10px;
+    backdrop-filter: blur(6px);
+  }
+
+  .left-sidebar {
+     position: fixed;
+  top: 0;
+  left: -100%;
+  width: 85%;
+  max-width: 320px;
+  height: 100vh;
+
+  backdrop-filter: blur(10px);
+  box-shadow: 2px 0 15px rgba(0, 0, 0, 0.5);
+  transition: left 0.3s ease;
+  z-index: 99999999999999999999999999999999999999999999999999999999999999999999999999999999999999;
+  overflow-y: auto;
+  padding: 20px;
+  border-right: 1px solid #444;
+  }
+  .left-sidebar.open {
+  left: 0;
+}
+ 
+  .right-sidebar {
+    margin-left: 15px;
+    width: 20%;
+  }
+
+  .user-profile, .sahuai-box, .people-know, .user-list {
+    
+    background: rgba(40, 20, 70, 0.2);
+    padding: 10px;
+    border-radius: 8px;
+    backdrop-filter: blur(5px);
+  }
+
+  main.feed {
+    flex-grow: 1;
+    background: rgba(20, 20, 40, 0.25);
+    padding: 15px;
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+  }
+
+  .post-input {
+    margin-bottom: 20px;
+  }
+
+  .post-input textarea {
+    width: 100%;
+    height: 80px;
+    background: rgba(50, 30, 100, 0.25);
+    border: none;
+    color: #fff;
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 8px;
+    resize: none;
+  }
+
+  .post-input button {
+    margin-top: 10px;
+    background: linear-gradient(135deg, #7700ff, #0072ff);
+    color: #fff;
+    border: none;
+    justify-self: right;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  #edit-profile {
+    background: linear-gradient(135deg, #9500ff, #003fff);
+    color: #fff;
+    border: none;
+    width: 100%;
+    justify-self: center;
+    padding: 6px 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+
+  .chat-header {
+    background: linear-gradient(135deg, #9900ff, #003d82);
+    padding: 15px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    text-shadow: 0px 0px 10px rgba(98, 0, 255, 0.8);
+  }
+
+  .chat-box {
+    height: 320px;
+    overflow-y: auto;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.03);
+    scrollbar-width: thin;
+    scrollbar-color: #6f00ff rgba(255, 255, 255, 0.1);
+  }
+
+  .user-message {
+    align-self: flex-end;
+    background: linear-gradient(135deg, rgba(98, 0, 255, 0.4), rgba(0, 87, 179, 0.4));
+    padding: 12px 15px;
+    margin: 10px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 140, 255, 0.5);
+    font-size: 15px;
+  }
+
+  .bot-message {
+    align-self: flex-start;
+    margin: 10px;
+    border-radius: 20px;
+    background: rgba(119, 0, 255, 0.2);
+    box-shadow: 0 4px 10px rgba(0, 140, 255, 0.3);
+    padding: 12px 15px;
+    font-size: 15px;
+  }
+
+  .chat-input {
+  
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+    backdrop-filter: blur(3px);
+  }
+
+  .chat-input input {
+    flex: 1;
+    padding: 10px;
+    border: 2px solid transparent;
+    border-radius: 10px;
+    outline: none;
+    width: 90%;
+    font-size: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transition: border 0.3s ease;
+  }
+
+  .chat-input input:focus {
+    border-color: #7700ff;
+  }
+
+  .chat-input button {
+    margin-left: 10px;
+    background: linear-gradient(135deg, #8400ff, #0072ff);
+    color: white;
+    justify-self: center;
+    width: 90%;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: background 0.3s ease, transform 0.2s ease;
+  }
+
+  .chat-input button:hover {
+    background: linear-gradient(135deg, #9900ff, #0056b3);
+    transform: scale(1.05);
+  }
+
+  .chat-button {
+    position: relative;
+    bottom: 200px;
+    
+    background: linear-gradient(135deg, #b700ff, #0072ff);
+    color: white;
+    border: 3px solid #ffffff;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    font-size: 30px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0, 150, 255, 0.7);
+    transition: all 0.3s ease;
+    z-index: 1000;
+  }
+.chat-button {
+  bottom: 20px;
+  right: 20px;
+  position: fixed;
+}
+
+  .chat-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 10px 25px rgba(0, 150, 255, 0.9);
+  }
+
+  @keyframes glow {
+    0% { box-shadow: 0 0 10px rgba(0, 140, 255, 0.5); }
+    50% { box-shadow: 0 0 20px rgba(0, 140, 255, 0.8); }
+    100% { box-shadow: 0 0 10px rgba(0, 140, 255, 0.5); }
+  }
+
+  .chat-container {
+    animation: glow 3s infinite alternate;
+  }
+
+  .loading-animation {
+    margin: 10px 0;
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .loading-animation .dot {
+    width: 10px;
+    height: 10px;
+    background-color: #999;
+    border-radius: 50%;
+    animation: bounce 1s infinite ease-in-out;
+  }
+
+  .loading-animation .dot:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+
+  .loading-animation .dot:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+#user-profile-editor,
+#userProfileView {
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+  @keyframes bounce {
+    0%, 100% {
+      transform: translateY(0px);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+@media screen and (max-width: 768px) {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    padding: 0;
+    background-color: #0a0a0a;
+    color: #ffffff;
+    font-family: 'Segoe UI', sans-serif;
+  }
+
+  .header {
+    background-color: #1c1c1e;
+    padding: 15px;
+    text-align: center;
+    border-bottom: 2px solid #6c63ff;
+  }
+button {
+  font-size: 15px;
+  padding: 10px;
+}
+
+.chat-input input,
+.chat-input button {
+  width: 100%;
+  margin-top: 10px;
+}
+.chat-input {
+  flex-direction: column;
+}
+
+  .header img {
+    width: 40px;
+    height: 40px;
+    vertical-align: middle;
+    margin-right: 10px;
+  }
+
+  .header h1 {
+    font-size: 20px;
+    color: #6c63ff;
+    display: inline-block;
+    margin: 0;
+    vertical-align: middle;
+  }
+.container {
+  flex-direction: column;
+  padding: 10px;
+}
+.left-sidebar,
+.right-sidebar {
+  width: 100%;
+  margin: 0 0 15px 0;
+}
+.feed {
+  width: 100%;
+}
+
+  .main-container {
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    gap: 20px;
+  }
+
+  .left-panel,
+  .right-panel,
+  .feed-section {
+    width: 100%;
+    background-color: #121212;
+    border-radius: 10px;
+    padding: 15px;
+    border: 1px solid #2c2c2e;
+  }
+
+  .profile-section {
+    text-align: center;
+  }
+
+  .profile-section img {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+  }
+
+  .profile-section h2 {
+    margin: 5px 0;
+    color: #6c63ff;
+  }
+
+  .profile-section button {
+    background-color: #6c63ff;
+    border: none;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  .feed-input {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .feed-input input[type="text"] {
+    padding: 10px;
+    border: 1px solid #2c2c2e;
+    border-radius: 5px;
+    background-color: #1c1c1e;
+    color: white;
+  }
+
+  .feed-input button {
+    background-color: #007aff;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+
+  .feeds-area {
+    margin-top: 15px;
+  }
+
+  .feed-post {
+    border-bottom: 1px solid #2c2c2e;
+    padding: 10px 0;
+  }
+
+  .people-you-may-know,
+  .sahuai-box {
+    margin-top: 20px;
+  }
+
+  .user-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #1c1c1e;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+
+  .user-card img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+
+  .user-card span {
+    flex: 1;
+    margin-left: 10px;
+    color: #ffffff;
+  }
+
+  .user-card button {
+    background-color: #6c63ff;
+    border: none;
+    color: white;
+    padding: 6px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+*, *::before, *::after {
+  transition: background 0.3s ease, color 0.3s ease;
+}
+*, *::before, *::after {
+  transition: background 0.3s ease, color 0.3s ease;
+}
+  body.light-mode {
+  background: linear-gradient(to bottom right, #f2f2ff, #fff);
+  color: #111;
+}
+
+body.light-mode .header {
+  background: rgba(255, 255, 255, 0.7);
+  color: #4b0082;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode .left-sidebar,
+body.light-mode .right-sidebar {
+  background: rgba(230, 230, 255, 0.6);
+}
+
+body.light-mode .user-profile,
+body.light-mode .sahuai-box,
+body.light-mode .people-know,
+body.light-mode .user-list {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+body.light-mode .user-card {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+body.light-mode .user-card:hover {
+  background: rgba(255, 255, 255, 0.95);
+}
+
+body.light-mode main.feed {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+body.light-mode .post-input textarea {
+  background: rgba(240, 240, 255, 0.8);
+  color: #222;
+}
+
+body.light-mode .post-input button,
+body.light-mode #edit-profile {
+  background: linear-gradient(135deg, #6a00ff, #0072ff);
+  color: #fff;
+}
+
+body.light-mode .chat-header {
+  background: linear-gradient(135deg, #a200ff, #0054a5);
+  color: white;
+  text-shadow: none;
+}
+
+body.light-mode .chat-box {
+  background: rgba(255, 255, 255, 0.7);
+  scrollbar-color: #5500ff #ddd;
+}
+
+body.light-mode .user-message {
+  background: linear-gradient(135deg, rgba(120, 50, 255, 0.3), rgba(0, 120, 255, 0.3));
+  color: #111;
+}
+
+body.light-mode .bot-message {
+  background: rgba(200, 200, 255, 0.5);
+  color: #111;
+}
+
+body.light-mode .chat-input {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+body.light-mode .chat-input input {
+  background: rgba(255, 255, 255, 0.6);
+  color: #111;
+}
+
+body.light-mode .chat-input button {
+  background: linear-gradient(135deg, #6f00ff, #0090ff);
+}
+
+body.light-mode .chat-button {
+  background: linear-gradient(135deg, #7f00ff, #00aaff);
+  border-color: #222;
+}
+
+body.light-mode .loading-animation .dot {
+  background-color: #555;
+}
+.footer {
+  background: linear-gradient(to right, #1c1c3c, #300048);
+  padding: 20px 10px;
+  text-align: center;
+  color: #ccc;
+  font-size: 14px;
+  margin-top: 40px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.footer-content p {
+  margin: 6px 0;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+body.light-mode .footer {
+  background: linear-gradient(to right, #f5f5ff, #eaeaff);
+  color: #333;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+body.light-mode #x{
+  color: black;
+}
+/* 🌑 DARK MODE Scrollbars (Default) */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #7700ff, #0072ff);
+  border-radius: 10px;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+}
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #9500ff, #0090ff);
+}
+
+/* 🌞 LIGHT MODE Scrollbars */
+body.light-mode ::-webkit-scrollbar {
+  width: 10px;
+}
+body.light-mode ::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 10px;
+}
+body.light-mode ::-webkit-scrollbar-thumb {
+  background: linear-gradient(to bottom, #6c63ff, #00aaff);
+  border-radius: 10px;
+  box-shadow: inset 0 0 4px rgba(255, 255, 255, 0.2);
+}
+body.light-mode ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(to bottom, #7f00ff, #0090ff);
+}
+.sahu-loader {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: #0e0e1c;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+  color: white;
+  font-family: 'Segoe UI', sans-serif;
+  transition: background 0.3s ease;
+}
+
+.loader-ring {
+  width: 60px;
+  height: 60px;
+  border: 6px solid rgba(255, 255, 255, 0.15);
+  border-top-color: #8e2de2;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+  box-shadow: 0 0 10px #8e2de2;
+}
+
+.loader-text {
+  font-size: 18px;
+  animation: fadeIn 1s ease;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Light Mode Loader Style */
+body.light-mode .sahu-loader {
+  background: #f0f0ff;
+  color: #222;
+}
+
+body.light-mode .loader-ring {
+  border: 6px solid rgba(0, 0, 0, 0.1);
+  border-top-color: #4a00e0;
+  box-shadow: 0 0 10px #4a00e040;
+}
+
+</style>
+
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <button onclick="toggleSidebar()" id="sidebar-toggle-btn">
+  ☰
+</button>
+
+  <img src="SahuPost logo.png" alt="SahuPost Logo" class="logo">
+  <h1 style=" position: relative;
+    left: 53px;">SahuPost</h1>
+  <button onclick="toggleTheme()" style="position:fixed; top:10px; right:10px; z-index:9999;justify-self: right; background: linear-gradient(to left,rgb(132, 0, 255),rgba(0, 0, 255, 0.562));color:white; border: none; font-size: 20px; cursor: pointer; padding: 10px; border-radius: 10%; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+    <span id="theme-icon">🌗 dark - mode</span>  <!-- Default icon for light theme -->
+   Toggle Theme
+</button>
+
+</header>
+<div id="loader" class="sahu-loader">
+  <div class="loader-ring"></div>
+  <p class="loader-text">Loading <strong>SahuPost</strong>...</p>
+</div>
+
+<div class="container">
+  <!-- Left Sidebar -->
+<aside  id="apple"  class="left-sidebar">
+    <div class="user-profile">
+    <button id="x" onclick="toggleSidebar()" style="
+  position: absolute; top: 10px; right: 10px;
+  background: transparent; color: white;
+  border: none; font-size: 22px; cursor: pointer;">❌</button>
+
+      <div id="my-profile"  class="my-profile" style="text-align: center; margin-bottom: 10px;">
+        <!-- JS will inject profile pic here -->
+      </div>
+      <h2 align="center"><strong>Welcome</strong> <span id="user-name"></span></h2>
+
+      <button id="edit-profile" onclick="fillProfileEditor();">✏️ Edit Profile</button>
+      <button onclick="signOutUser()" id="signout-btn" style="
+  margin-top: 20px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, crimson, orange);
+  color: white;
+  border: none;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.2s;
+">
+  🚪 Sign Out
+</button>
+
+    </div>
+
+    <!-- SahuAI Chatbox -->
+    <div class="sahuai-box">
+      <div class="chat-container" id="chat-container">
+        <div class="chat-header">SahuPost</div>
+        <div class="chat-box" id="chat-box"></div>
+        <div class="chat-input1">
+          <div class="chat-input">
+            <div id="loading-indicator" style="display:none;" class="loading-animation">
+              <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+            </div>
+            <input type="text" id="user-input" placeholder="Type a message..." onkeypress="handleKeyPress(event)" >
+            <button onclick="sendMessage()" id="BAP">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+
+<div id="overlay" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background-color:rgba(0,0,0,0.6); z-index:9999;"></div>
+
+<div id="userProfileView" 
+     style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+            background: linear-gradient(to left,rgba(0, 17, 255, 0.336),rgba(66, 0, 128, 0.418));
+            padding:20px; border-radius:10px; z-index:10000;
+            width: 400px; max-width: 90%; transition: all 0.3s ease;">
+</div>
+<div id="user-profile-editor" style="
+  display: none;
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  background: #1e1e2f;
+  padding: 30px 30px 20px;
+  border-radius: 16px;
+  max-width: 400px;
+  width: 100%;
+  height: 100%;
+  box-shadow: 0 0 20px rgba(0,0,0,0.3);
+  z-index: 9999;
+  color: white;
+  font-family: sans-serif;
+">
+
+  <!-- ❌ Close Button -->
+  <button onclick="closeProfileEditor()" style="
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: transparent;
+    color: white;
+    font-size: 20px;
+    border: none;
+    cursor: pointer;
+  ">✖</button>
+
+  <h2 style="font-size: 20px; font-weight: bold; margin-bottom: 15px;">🖼 Choose Your Profile Photo</h2>
+  <div id="photo-options" style="
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-bottom: 20px;
+  "></div>
+
+  <h2 style="margin-bottom: 10px;">📝 Edit Profile Info</h2>
+  <input id="nameInput" placeholder="Full Name" class="profile-input" />
+  <input id="bioInput" placeholder="Bio" class="profile-input" />
+  <input id="ageInput" type="number" placeholder="Age" class="profile-input" />
+  <input id="countryInput" placeholder="Country" class="profile-input" />
+  <input id="websiteInput" placeholder="Website" class="profile-input" />
+
+  <button onclick="saveProfile()" style="
+    margin-top: 20px;
+    background: linear-gradient(135deg, purple, blue);
+    color: white;
+    padding: 10px 18px;
+    border-radius: 10px;
+    border: none;
+    font-size: 15px;
+    width: 100%;
+    justify-self: center;
+    cursor: pointer;
+    transition: 0.2s;
+  ">💾 Save Profile</button>
+</div>
+
+
+<style>
+  .profile-input {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #2e2e40;
+    color: white;
+    font-size: 14px;
+    outline: none;
+  }
+  /* 🌞 LIGHT MODE overrides */
+body.light-mode #overlay {
+  background-color: rgba(255, 255, 255, 0.6) !important;
+}
+
+body.light-mode #userProfileView {
+  background: linear-gradient(to left, rgba(0, 102, 255, 0.15), rgba(128, 0, 255, 0.12)) !important;
+  color: black !important;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode #user-profile-editor {
+  background: #ffffff !important;
+  color: #111 !important;
+  box-shadow: 0 0 18px rgba(0, 0, 0, 0.1);
+}
+
+body.light-mode #user-profile-editor button {
+  color: #111 !important;
+}
+
+body.light-mode #user-profile-editor input.profile-input {
+  background: #f4f4f8;
+  color: #111;
+  border: 1px solid #ccc;
+}
+
+body.light-mode #user-profile-editor button[onclick="saveProfile()"] {
+  background: linear-gradient(135deg, #9145ec, #5a95f5);
+  color: white !important;
+}
+
+body.light-mode #user-profile-editor h2 {
+  color: #222;
+}
+
+
+  .profile-input::placeholder {
+    color: #aaa;
+  }
+</style>
+
+  <!-- Main Feed Area -->
+  <main class="feed">
+    <div class="post-input">
+   
+      <h2 id="welcome" align="center"><strong>Welcome</strong> <span id="user-name"></span>😎</h2>
+      <textarea placeholder="What's In Your Mind Today?" id="post-text"></textarea>
+      <button onclick="postFeed()">Post</button>
+    </div>
+
+    <div class="feeds" id="feeds">
+      <!-- All feed posts will go here -->
+    </div>
+      <footer class="footer">
+  <div class="footer-content">
+    <p>© 2025 <strong>SahuPost</strong> by Revant Kumar Sahu. All rights reserved.</p>
+    <p>Built with ❤️ using HTML, CSS, JavaScript, and Firebase</p>
+  </div>
+</footer>
+  </main>
+
+  <!-- Right Sidebar -->
+  <aside class="right-sidebar">
+    <div class="people-know">
+      <h4>People You May Know</h4>
+    </div>
+    <div class="user-list">
+      <!-- Other user profiles to view -->
+    </div>
+  </aside>
+
+
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword
+  } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  collection,
+  getDocs,
+  addDoc,
+  query,
+  orderBy,
+  where ,
+   writeBatch
+} from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+ import { serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+import { signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+
+  // ✅ Firebase Config
+  const firebaseConfig = {
+    apiKey: "AIzaSyD3ccBgd7d4RA2On9G6qJ0bWuH9JHtgCTc",
+    authDomain: "sahupost-92d1a.firebaseapp.com",
+    projectId: "sahupost-92d1a",
+    storageBucket: "sahupost-92d1a.firebasestorage.app",
+    messagingSenderId: "1097651897779",
+    appId: "1:1097651897779:web:94888b6269c438e705f7c6"
+  };
+
+  // ✅ Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // 🌍 Export for inline script usage
+  window.firebaseApp = app;
+  window.auth = auth;
+  window.db = db;
+
+  // 🎯 DOM Selectors
+  const nameEl = document.querySelector("#user-name");
+
+  const myProfileContainer = document.querySelector(".my-profile"); // ✅ Add this container in HTML
+  const userListContainer = document.querySelector(".user-list");
+  const peopleKnowHeading = document.querySelector(".people-know");
+
+  // 👤 Auth State Handler
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "signin.html";
+      return;
+    }
+
+    const uid = user.uid;
+    const currentUserRef = doc(db, "users", uid);
+    const currentUserSnap = await getDoc(currentUserRef);
+
+    if (!currentUserSnap.exists()) return;
+
+    const data = currentUserSnap.data();
+
+    // 🧠 Populate mini-profile
+    nameEl.textContent = data.name || "No Name";
+    document.querySelector("#welcome span").textContent = data.name || "No Name";
+    const profilePic = document.createElement("img");
+    profilePic.src = data.profilePhotoURL || "default-avatar.png";
+    
+    profilePic.alt = "Profile Photo";
+    profilePic.style = "width: 60px; height: 60px; border-radius: 50%; margin-bottom: 10px;";
+
+    if (myProfileContainer) {
+      myProfileContainer.innerHTML = ""; // Clear existing
+      myProfileContainer.appendChild(profilePic);
+    }
+
+    // 🧑‍🤝‍🧑 Load other users
+    const usersSnap = await getDocs(collection(db, "users"));
+    let totalUsers = 0;
+    userListContainer.innerHTML = "";
+
+    usersSnap.forEach((docSnap) => {
+      const userData = docSnap.data();
+
+      if (userData.uid === uid) return; // Skip self
+      totalUsers++;
+
+      const card = document.createElement("div");
+      card.className = "user-card";
+     
+      card.innerHTML = `
+        <img src="${userData.profilePhotoURL || 'data:image/png;base64,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'}"
+             alt="User"
+             width="50"
+             style="border-radius:50%; margin-bottom:5px;" />
+        <p><strong>${userData.name}</strong></p>
+      
+        <button onclick="viewUserProfile('${userData.uid}')"
+                style="  margin-top: 10px;background: linear-gradient(135deg, #7700ff, #0072ff);color: #fff;border: none;padding: 10px 15px;border-radius: 6px;cursor: pointer;">🔍 View Profile</button>
+      `;
+
+      userListContainer.appendChild(card);
+    });
+
+    peopleKnowHeading.innerHTML = `<h4>People You May Know :</h4>`;
+  });
+
+
+// 🧾 Post Feed Function
+window.postFeed = async function () {
+  const text = document.getElementById("post-text").value.trim();
+  if (!text) return alert("Post something first!");
+
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const userDoc = await getDoc(doc(db, "users", user.uid));
+  if (!userDoc.exists()) return;
+
+  const userData = userDoc.data();
+
+  await addDoc(collection(db, "feeds"), {
+    uid: user.uid,
+    name: userData.name || "Unknown",
+    profilePhotoURL: userData.profilePhotoURL || defaultAvatar,
+    text,
+    timestamp: serverTimestamp(),
+  });
+
+  document.getElementById("post-text").value = "";
+  loadFeeds(); // Refresh feeds
+};
+window.checkIfLight = function () {
+  return document.body.classList.contains("light-mode");
+};
+
+
+async function loadFeeds() {
+  const feedContainer = document.getElementById("feeds");
+  feedContainer.innerHTML = "Loading...";
+    const loader = document.getElementById('loader');
+  const q = query(collection(db, "feeds"), orderBy("timestamp", "desc"));
+  const snap = await getDocs(q);
+  feedContainer.innerHTML = "";
+
+  snap.forEach(docSnap => {
+    const feed = docSnap.data();
+    const postId = docSnap.id;
+    const likesCount = (feed.likes && feed.likes.length) || 0;
+
+    const postEl = document.createElement("div");
+    postEl.className = "feed-post";
+    postEl.style = "margin-bottom:15px; padding:10px; background:#1e1e2f; border-radius:10px;";
+    const isMyPost = feed.uid === auth.currentUser?.uid;
+    postEl.innerHTML = `
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+        <img src="${feed.profilePhotoURL}" style="width:40px;height:40px;border-radius:50%;" />
+        <strong>${feed.name}</strong>
+      </div>
+      <p style="font-size:15px;">${feed.text}</p>
+
+      <div   style="display:flex; gap:15px; margin-top:10px;">
+        <button id="li-${postId}" onclick="toggleLike('${postId}')" style="
+          background: linear-gradient(135deg, #ff416c, #ff4b2b);
+          color: white;
+          border: none;
+          padding: 6px 14px;
+          border-radius: 20px;
+          font-size: 14px;
+          cursor: pointer;
+        ">👍 <span>${likesCount} ${likesCount === 1 ? 'like' : 'likes'}</span></button>
+
+        <button id="com-${postId}" onclick="toggleCommentBox('${postId}')" style="
+          background: linear-gradient(135deg, #36d1dc, #5b86e5);
+          color: white;
+          border: none;
+          padding: 6px 14px;
+          border-radius: 20px;
+          font-size: 14px;
+          cursor: pointer;
+        ">💬 Comment</button>
+      </div>
+        ${isMyPost ? `
+         <div style="display:flex; gap:15px; margin-top:20px;">
+      <button onclick="editPost('${postId}', \`${feed.text.replace(/`/g, "\\`")}\`)" style="
+        background: linear-gradient(135deg, #ffaa00, #ff5500);
+        color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 14px; cursor: pointer;
+      ">✏️ Edit</button>
+      <button onclick="deletePost('${postId}')" style="
+        background: linear-gradient(135deg, crimson, darkred);
+        color: white; border: none; padding: 6px 14px; border-radius: 20px; font-size: 14px; cursor: pointer;
+      ">🗑 Delete</button></div>
+        <div id="comment-box-${postId}" style="
+        display: none;
+        margin-top: 15px;
+        background: rgba(42, 42, 67, 0.9);
+        padding: 16px;
+        border-radius: 12px;
+        box-shadow: 0 0 8px rgba(138, 43, 226, 0.3);
+      ">
+        <textarea id="comment-input-${postId}" placeholder="Write a comment..." style="
+          width: 100%;
+          height: 60px;
+          background: rgba(30, 30, 47, 0.95);
+          color: white;
+          border: 1px solid #555;
+          border-radius: 10px;
+          padding: 10px 12px;
+          resize: none;
+          font-size: 14px;
+          outline: none;
+          box-shadow: inset 0 0 4px #00000080;
+        "></textarea>
+
+        <button onclick="submitComment('${postId}')" style="
+          margin-top: 12px;
+          background: linear-gradient(135deg, #8e2de2, #4a00e0);
+          color: white;
+          border: none;
+          padding: 8px 18px;
+          border-radius: 10px;
+          cursor: pointer;
+          font-size: 14px;
+          float: right;
+          transition: background 0.3s ease;
+        ">🚀 Post</button>
+
+        <div style="clear:both;"></div>
+
+        <div id="comments-${postId}" style="margin-top: 20px;"></div>
+      </div>
+   
+    ` : `
+         <div id="comment-box-${postId}" style="
+        display: none;
+        margin-top: 15px;
+        background: rgba(42, 42, 67, 0.9);
+        padding: 16px;
+        border-radius: 12px;
+        box-shadow: 0 0 8px rgba(138, 43, 226, 0.3);
+      ">
+        <textarea id="comment-input-${postId}" placeholder="Write a comment..." style="
+          width: 100%;
+          height: 60px;
+          background: rgba(30, 30, 47, 0.95);
+          color: white;
+          border: 1px solid #555;
+          border-radius: 10px;
+          padding: 10px 12px;
+          resize: none;
+          font-size: 14px;
+          outline: none;
+          box-shadow: inset 0 0 4px #00000080;
+        "></textarea>
+
+        <button onclick="submitComment('${postId}')" style="
+          margin-top: 12px;
+          background: linear-gradient(135deg, #8e2de2, #4a00e0);
+          color: white;
+          border: none;
+          padding: 8px 18px;
+          border-radius: 10px;
+          cursor: pointer;
+          font-size: 14px;
+          float: right;
+          transition: background 0.3s ease;
+        ">🚀 Post</button>
+
+        <div style="clear:both;"></div>
+
+        <div id="comments-${postId}" style="margin-top: 20px;"></div>
+      </div>
+    `}
+
+    `;
+
+    // 🔁 Append to DOM BEFORE checking style
+    feedContainer.appendChild(postEl);
+
+    const commentBox = document.getElementById(`comment-box-${postId}`);
+    const comBtn = document.getElementById(`com-${postId}`);
+    const isOpen = isCommentOpen(postId);
+
+    if (commentBox && comBtn) {
+      commentBox.style.display = isOpen ? "block" : "none";
+      comBtn.style.background = isOpen
+        ? "linear-gradient(135deg, #8e2de2, #4a00e0)"
+        : "linear-gradient(135deg, #36d1dc, #5b86e5)";
+      comBtn.style.transition = "background 0.3s ease, transform 0.2s ease";
+      comBtn.style.transform = isOpen ? "scale(1.05)" : "scale(1)";
+    }
+
+    // 🔁 Set Like button style
+    const likeBtn = document.getElementById(`li-${postId}`);
+    const user = auth.currentUser;
+    const isLiked = user && feed.likes?.includes(user.uid);
+
+    if (likeBtn) {
+      likeBtn.style.background = isLiked
+        ? "linear-gradient(135deg, #ff416c, #ff4b2b)"
+        : "linear-gradient(135deg, blue, purple)";
+    }
+
+// 🔁 Set Comment button style
+const commentBtn = document.getElementById(`com-${postId}`);
+
+if (commentBox && commentBtn) {
+  if (isCommentOpen(postId)) {
+    commentBox.style.display = "block";
+    commentBtn.style.background = "linear-gradient(135deg, #00c6ff, #0072ff)";
+  } else {
+    commentBox.style.display = "none";
+    commentBtn.style.background = "linear-gradient(135deg, #36d1dc, #5b86e5)";
+  }
+}
+
+if (checkIfLight()) {
+  postEl.style.background = "#ffffff"; // Light card background
+  // comment/input boxes
+  const commentBox = postEl.querySelector(`#comment-box-${postId}`);
+  if (commentBox) commentBox.style.background = "#f0f0ff";
+
+  const textarea = postEl.querySelector(`#comment-input-${postId}`);
+  if (textarea) {
+    textarea.style.background = "#ffffff";
+    textarea.style.color = "#000";
+    textarea.style.border = "1px solid #aaa";
+  }
+}
+
+    // Hide loader after everything is done (no matter what)
+    if (loader) loader.style.display = "none";
+  
+    // 🔄 Load comments
+    loadComments(postId);
+  });
+}
+async function loadComments(postId) {
+  const commentsRef = collection(db, "feeds", postId, "comments");
+  const commentsSnap = await getDocs(query(commentsRef, orderBy("timestamp")));
+
+  const commentsDiv = document.getElementById(`comments-${postId}`);
+if (commentsDiv) commentsDiv.innerHTML = "";
+
+  commentsSnap.forEach((doc) => {
+    const comment = doc.data();
+    const commentEl = document.createElement("div");
+    commentEl.style = "margin-top:8px; padding:5px 10px; background:#292943; border-radius:6px;";
+commentEl.innerHTML = `
+  <div style="
+    padding: 12px 14px;
+    background: #1e1e2f;
+    border-radius: 10px;
+    margin-top: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  ">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+      <img src="${comment.profilePhotoURL}" style="width: 32px; height: 32px; border-radius: 50%;" />
+      <strong style="color: #fff;">${comment.name}</strong>
+    </div>
+
+    <p style="margin-left: 42px; color: #ccc; font-size: 14px;">${comment.text}</p>
+
+    <div style="margin-left: 42px; margin-top: 8px;">
+      <button onclick="showReplyInput('${postId}', '${doc.id}')" style="
+        background: transparent;
+        color: #8e2de2;
+        border: none;
+        cursor: pointer;
+        font-size: 13px;
+      ">💬 Reply</button>
+
+      <div id="reply-box-${doc.id}" style="display:none; margin-top: 6px;">
+        <textarea id="reply-input-${doc.id}" placeholder="Write a reply..." style="
+          width: 100%;
+          height: 50px;
+          background: #12121c;
+          color: white;
+          border: 1px solid #333;
+          border-radius: 8px;
+          padding: 8px;
+          font-size: 13px;
+          resize: none;
+        "></textarea>
+        <button onclick="submitReply('${postId}', '${doc.id}')" style="
+          margin-top: 6px;
+          background: linear-gradient(135deg, #8e2de2, #4a00e0);
+          color: white;
+          border: none;
+          padding: 6px 14px;
+          border-radius: 8px;
+          font-size: 13px;
+          float: right;
+        ">🚀 Reply</button>
+      </div>
+
+      <div id="replies-${doc.id}" style="margin-top: 12px;"></div>
+    </div>
+  </div>
+`;
+  if( commentsDiv)commentsDiv.appendChild(commentEl);
+  if (checkIfLight()) {
+  commentEl.style.background = "#eeeeff"; // outer wrap
+  const box = commentEl.querySelector("div");
+  if (box) box.style.background = "#fefefe";
+
+  const name = commentEl.querySelector("strong");
+  if (name) name.style.color = "#000";
+
+  const text = commentEl.querySelector("p");
+  if (text) text.style.color = "#222";
+
+  const replyInput = commentEl.querySelector(`#reply-input-${doc.id}`);
+  if (replyInput) {
+    replyInput.style.background = "#fff";
+    replyInput.style.color = "#000";
+    replyInput.style.border = "1px solid #aaa";
+  }
+}
+
+  loadReplies(postId, doc.id); // 👇 load replies under this comment
+
+  });
+}
+async function loadReplies(postId, commentId) {
+  const repliesRef = collection(db, "feeds", postId, "comments", commentId, "replies");
+  const repliesSnap = await getDocs(query(repliesRef, orderBy("timestamp")));
+
+  const repliesDiv = document.getElementById(`replies-${commentId}`);
+  if(repliesDiv)repliesDiv.innerHTML = "";
+
+  repliesSnap.forEach(replyDoc => {
+    const reply = replyDoc.data();
+    const replyEl = document.createElement("div");
+    replyEl.style = "margin-left:20px; margin-top:6px; padding:4px 10px; background:#2a2a3a; border-radius:6px; font-size:13px;";
+    replyEl.innerHTML = `
+      <strong>${reply.name}</strong>: ${reply.text}
+    `;
+    if (checkIfLight()) {
+  replyEl.style.background = "#f4f4ff";
+  replyEl.style.color = "#000";
+}
+
+    if(repliesDiv)repliesDiv.appendChild(replyEl);
+  });
+}
+window.toggleCommentBox = function(postId) {
+  const box = document.getElementById(`comment-box-${postId}`);
+  const comBtn = document.getElementById(`com-${postId}`);
+  if (!box || !comBtn) return;
+
+  // ✅ Check current open state from localStorage instead of box.style
+  const isOpen = !isCommentOpen(postId); // toggle
+
+  // ✅ Apply state visually
+  box.style.display = isOpen ? "block" : "none";
+  comBtn.style.background = isOpen
+    ? "linear-gradient(135deg, #8e2de2, #4a00e0)"
+    : "linear-gradient(135deg, #36d1dc, #5b86e5)";
+  comBtn.style.transition = "background 0.3s ease, transform 0.2s ease";
+  comBtn.style.transform = "scale(1.05)";
+
+  // 💾 Save open state
+  setOpenComment(postId, isOpen);
+};
+window.editPost = async function (postId, oldText) {
+  const newText = prompt("📝 Edit your post:", oldText);
+  if (!newText || newText.trim() === oldText.trim()) return;
+
+  try {
+    await updateDoc(doc(db, "feeds", postId), {
+      text: newText.trim(),
+      edited: true,
+      editedAt: serverTimestamp(),
+    });
+    loadFeeds();
+  } catch (e) {
+    alert("❌ Error editing post.");
+  }
+};
+
+window.deletePost = async function (postId) {
+  if (!confirm("🗑 Are you sure you want to delete this post?")) return;
+  try {
+    await deleteDoc(doc(db, "feeds", postId));
+    loadFeeds();
+  } catch (e) {
+    alert("❌ Failed to delete.");
+    console.error("Delete error:", e);
+  }
+};
+
+window.toggleLike = async function(postId) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const postRef = doc(db, "feeds", postId);
+  const postSnap = await getDoc(postRef);
+  if (!postSnap.exists()) return;
+
+  let data = postSnap.data();
+  let likes = data.likes || [];
+
+  const isLiked = likes.includes(user.uid);
+  if (isLiked) {
+    likes = likes.filter(uid => uid !== user.uid);
+  } else {
+    likes.push(user.uid);
+  }
+
+  await updateDoc(postRef, { likes });
+
+  // 🔁 Update the button style IMMEDIATELY
+  const likeBtn = document.getElementById(`li-${postId}`);
+  if (likeBtn) {
+    likeBtn.style.background = isLiked
+      ? "linear-gradient(135deg, blue, purple)"
+      : "linear-gradient(135deg, #ff416c, #ff4b2b)";
+    likeBtn.style.transform = "scale(1.05)";
+    likeBtn.style.transition = "all 0.3s ease";
+  }
+
+
+  if (likeBtn) {
+    const likeCountSpan = likeBtn.querySelector("span");
+    likeBtn.style.background = isLiked
+      ? "linear-gradient(135deg, blue, purple)"
+      : "linear-gradient(135deg, #ff416c, #ff4b2b)";
+    likeBtn.style.transform = "scale(1.05)";
+    likeBtn.style.transition = "all 0.3s ease";
+
+    if (likeCountSpan) {
+      const newCount = isLiked ? likes.length : likes.length;
+      likeCountSpan.textContent = `${newCount} ${newCount === 1 ? "like" : "likes"}`;
+    }
+  }
+};
+
+function setOpenComment(postId, isOpen) {
+  let openComments = JSON.parse(localStorage.getItem("openComments") || "[]");
+  if (isOpen) {
+    if (!openComments.includes(postId)) openComments.push(postId);
+  } else {
+    openComments = openComments.filter(id => id !== postId);
+  }
+  localStorage.setItem("openComments", JSON.stringify(openComments));
+}
+
+function isCommentOpen(postId) {
+  let openComments = JSON.parse(localStorage.getItem("openComments") || "[]");
+  return openComments.includes(postId);
+}
+window.signOutUser = async function () {
+  try {
+    await signOut(auth);
+    localStorage.clear();
+    alert("👋 Signed out successfully!");
+    window.location.href = "/"; // or wherever your login/landing page is
+  } catch (err) {
+    console.error("❌ Sign-out error:", err);
+    alert("Failed to sign out. Try again.");
+  }
+};
+
+async function renderReplies(postId, commentId, container) {
+  const replyRef = collection(db, "feeds", postId, "comments", commentId, "replies");
+  const repliesSnap = await getDocs(query(replyRef, orderBy("timestamp")));
+
+  repliesSnap.forEach((replyDoc) => {
+    const reply = replyDoc.data();
+    const replyDiv = document.createElement("div");
+    replyDiv.innerHTML = `💬 ${reply.name}: ${reply.text}`;
+    replyDiv.style.marginLeft = "30px";
+    container.appendChild(replyDiv);
+
+    // 🌀 Load more replies to this reply (recursion)
+    renderReplies(postId, replyDoc.id, replyDiv);
+  });
+}
+window.showReplyInput = function(postId, commentId) {
+  const replyBox = document.getElementById(`reply-box-${commentId}`);
+  replyBox.style.display = replyBox.style.display === "none" ? "block" : "none";
+};
+window.submitReply = async function(postId, commentId) {
+  const replyText = document.getElementById(`reply-input-${commentId}`).value.trim();
+  if (!replyText) return;
+
+  const user = auth.currentUser;
+  const userDoc = await getDoc(doc(db, "users", user.uid));
+  const userData = userDoc.data();
+
+  await addDoc(collection(db, "feeds", postId, "comments", commentId, "replies"), {
+    uid: user.uid,
+    name: userData.name,
+    profilePhotoURL: userData.profilePhotoURL,
+    text: replyText,
+    timestamp: serverTimestamp()
+  });
+
+  document.getElementById(`reply-input-${commentId}`).value = "";
+  loadReplies(postId, commentId); // 🔄 load the replies under this comment
+};
+
+window.submitComment = async function(postId) {
+  const user = auth.currentUser;
+  const text = document.getElementById(`comment-input-${postId}`).value.trim();
+  if (!user || !text) return;
+
+  const userDoc = await getDoc(doc(db, "users", user.uid));
+  const userData = userDoc.data();
+
+  const commentRef = collection(db, "feeds", postId, "comments");
+  await addDoc(commentRef, {
+    uid: user.uid,
+    name: userData.name || "Anonymous",
+    profilePhotoURL: userData.profilePhotoURL || "default-avatar.png",
+    text,
+    timestamp: serverTimestamp(),
+  });
+
+  document.getElementById(`comment-input-${postId}`).value = "";
+  loadFeeds();
+};
+window.toggleLike = toggleLike;
+
+ // Toggle theme and save to localStorage
+window.toggleTheme = function () {
+  const isNowLight = document.body.classList.toggle("light-mode"); // toggle returns the new state
+  localStorage.setItem("sahupost-theme", isNowLight ? "light" : "dark");
+
+  const icon = document.getElementById("theme-icon");
+  if (icon) icon.innerText = isNowLight ? "🌞 Light" : "🌙 Dark";
+  loadFeeds(); // Reload feeds after theme toggle
+
+};
+
+window.addEventListener("DOMContentLoaded", () => {
+  const saved = localStorage.getItem("sahupost-theme");
+
+  if (saved === "light") {
+    document.body.classList.add("light-mode");
+  } else {
+    document.body.classList.remove("light-mode");
+  }
+
+  // ✅ Set icon based on saved theme
+  const icon = document.getElementById("theme-icon");
+  if (icon) icon.innerText = saved === "light" ? "🌞 Light" : "🌙 Dark";
+});
+
+// ✅ Auto-load on start
+onAuthStateChanged(auth, async (user) => {
+  if (user) loadFeeds();
+});
+
+window.viewUserProfile = async function (uid) {
+  const overlay = document.getElementById("overlay");
+  const userProfileContainer = document.getElementById("userProfileView");
+
+  overlay.style.display = "block";
+  userProfileContainer.style.display = "block";
+  userProfileContainer.innerHTML = "Loading...";
+
+  // Close on clicking outside the profile box
+  overlay.onclick = function (e) {
+    if (e.target === overlay) {
+      overlay.style.display = "none";
+      userProfileContainer.style.display = "none";
+    }
+  };
+
+  // Inject animation styles once
+  if (!document.getElementById("profileAnimations")) {
+    const style = document.createElement("style");
+    style.id = "profileAnimations";
+    style.innerHTML = `
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      @keyframes zoomIn {
+        from { transform: scale(0.8); opacity: 0; }
+        to { transform: scale(1); opacity: 1; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  try {
+    const userRef = doc(db, "users", uid);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists()) {
+      const data = userSnap.data();
+      const createdDate = data.createdAt?.toDate().toLocaleString();
+      const updatedDate = data.updatedAt?.toDate().toLocaleString();
+
+      let fieldsHTML = "";
+
+      if (data.bio) fieldsHTML += `<p style="margin: 6px 0;"><strong>Bio:</strong> ${data.bio}</p>`;
+      if (data.age) fieldsHTML += `<p><strong>Age:</strong> ${data.age}</p>`;
+      if (data.country) fieldsHTML += `<p><strong>Country:</strong> ${data.country}</p>`;
+      if (data.email) fieldsHTML += `<p><strong>Email:</strong> ${data.email}</p>`;
+      if (data.website) {
+        fieldsHTML += `<p><strong>Website:</strong> <a href="${data.website}" target="_blank">${data.website}</a></p>`;
+      }
+      if (createdDate) fieldsHTML += `<p><strong>Joined:</strong> ${createdDate}</p>`;
+      if (updatedDate) fieldsHTML += `<p><strong>Last Updated:</strong> ${updatedDate}</p>`;
+
+      userProfileContainer.innerHTML = `
+        <div class="profile-box" style="
+          text-align: center;
+          padding: 20px;
+          border-radius: 12px;
+          
+          overflow: hidden;
+         
+          animation: fadeIn 0.3s ease-in-out;
+          max-width: 350px;
+          margin: 50px auto;
+        ">
+          <img src="${data.profilePhotoURL || 'default.png'}" 
+               alt="Profile Photo" 
+               style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin-bottom: 10px;
+                      animation: zoomIn 0.4s ease;" />
+          
+          <h2 style="margin: 0;">${data.name || "Unknown"}</h2>
+          ${fieldsHTML}
+
+          <button
+            style="margin-top: 15px; background: linear-gradient(135deg, #7700ff, #0072ff); 
+                   color: #fff; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;"
+            onclick="document.getElementById('userProfileView').style.display = 'none'; 
+                     document.getElementById('overlay').style.display = 'none';">
+            Close
+          </button>
+        </div>
+      `;
+    } else {
+      userProfileContainer.innerHTML = "User not found.";
+    }
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    userProfileContainer.innerHTML = "Error loading profile.";
+  }
+};
+const profilePhotos = [
+  "https://www.pngmart.com/files/22/User-Avatar-Profile-PNG.png",  
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkS8v2vSpIzK2HCPWDdfZP3vbvQhEm5fxuwkNENSNSswbBoWScLb0h3GjVFqgZB9FEpSg&usqp=CAU",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkfF6nBhidhIzL330CYtg70I8tpDBGJ2YjBPnE9D9gY0iLmGu563WBIab4KBexSDv7kG8&usqp=CAU",
+  "https://www.kindpng.com/picc/m/664-6643641_avatar-transparent-background-user-icon-hd-png-download.png",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDtAJSO01-u8cV6hUbdBn1WIEqd1pQURT_WydQXKGejZqmk1U4UoKybT_llB0gcT6niYU&usqp=CAU",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRgKkvkgQk4wH555z-fArrlYBw-TkAENpB7FYo3w6Mx1wXQAv0whmG_ZUlPsWNBWwfusY&usqp=CAU",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxQsKPal6ph5ZV8Q3Rw_-eqAwuDfXF33Hk988jGUMNN3oh12d2B7iMBWj8Ir_u9mWV1bs&usqp=CAU",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnP-QDvd3RxOcfELRjDluHdzwfKW1xxKHBrM9_dHUz5wxJbvMVko5vn1aQsMy4lmrIHk&usqp=CAU",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRV_1X-dUZ-fnJugYJxCZkRVZozc-p912TRASIwMUslJ-MEEjgKqhF9bd32-M7fykptZ18&usqp=CAU",
+  
+];
+let selectedPhoto = profilePhotos[0];
+
+// Render image selector
+function renderPhotoOptions() {
+  const container = document.getElementById("photo-options");
+  container.innerHTML = "";
+
+  profilePhotos.forEach((img) => {
+    const imgEl = document.createElement("img");
+    imgEl.src = img;
+    imgEl.style = `
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 3px solid ${selectedPhoto === img ? 'purple' : '#555'};
+      box-shadow: ${selectedPhoto === img ? '0 0 8px purple' : 'none'};
+      transition: all 0.2s ease;
+    `;
+    imgEl.onclick = () => {
+      selectedPhoto = img;
+      renderPhotoOptions();
+    };
+    container.appendChild(imgEl);
+  });
+}
+
+// Autofill data when profile editor opens
+window.fillProfileEditor = async function () {
+  const user = auth.currentUser;
+  if (!user) return alert("Login first!");
+
+  const docRef = doc(db, "users", user.uid);
+  const snap = await getDoc(docRef);
+  if (!snap.exists()) return;
+
+  const data = snap.data();
+
+  document.getElementById("nameInput").value = data.name || "";
+  document.getElementById("bioInput").value = data.bio || "";
+  document.getElementById("ageInput").value = data.age || "";
+  document.getElementById("countryInput").value = data.country || "";
+  document.getElementById("websiteInput").value = data.website || "";
+  selectedPhoto = data.profilePhotoURL || profilePhotos[0];
+
+  renderPhotoOptions();
+  document.getElementById("user-profile-editor").style.display = "block";
+};
+
+window.closeProfileEditor = function () {
+  document.getElementById("user-profile-editor").style.display = "none";
+  document.getElementById("overlay").style.display = "none";
+};
+
+window.saveProfile = async function () {
+  const user = auth.currentUser;
+  if (!user) return alert("⚠️ Please log in first!");
+
+  const docRef = doc(db, "users", user.uid);
+
+  const profileData = {
+    name: document.getElementById("nameInput").value.trim(),
+    bio: document.getElementById("bioInput").value.trim(),
+    age: Number(document.getElementById("ageInput").value),
+    country: document.getElementById("countryInput").value.trim(),
+    website: document.getElementById("websiteInput").value.trim(),
+    profilePhotoURL: selectedPhoto,
+    updatedAt: serverTimestamp(),
+    completedProfile: true,
+  };
+
+  try {
+    // 1️⃣ Update user's main profile
+    await updateDoc(docRef, profileData);
+
+    // 2️⃣ Update sidebar preview
+    document.getElementById("user-name").innerText = profileData.name;
+    document.getElementById("my-profile").innerHTML = `
+      <img src="${profileData.profilePhotoURL}" style="width: 70px; height: 70px; border-radius: 50%; margin-bottom: 8px;" />
+    `;
+
+    // 3️⃣ Batch update posts + comments + replies
+    const batch = writeBatch(db);
+
+    const feedQuery = await getDocs(collection(db, "feeds"));
+    for (const feedDoc of feedQuery.docs) {
+      const feed = feedDoc.data();
+      const feedRef = doc(db, "feeds", feedDoc.id);
+
+      // 🔄 Update feed if by same user
+      if (feed.uid === user.uid) {
+        batch.update(feedRef, {
+          name: profileData.name,
+          profilePhotoURL: profileData.profilePhotoURL,
+        });
+      }
+
+      // 🔄 Check comments in each feed
+      const commentsSnap = await getDocs(collection(db, "feeds", feedDoc.id, "comments"));
+      for (const commentDoc of commentsSnap.docs) {
+        const comment = commentDoc.data();
+        const commentRef = doc(db, "feeds", feedDoc.id, "comments", commentDoc.id);
+
+        if (comment.uid === user.uid) {
+          batch.update(commentRef, {
+            name: profileData.name,
+            profilePhotoURL: profileData.profilePhotoURL,
+          });
+        }
+
+        // 🔄 Check replies inside this comment
+        const repliesSnap = await getDocs(collection(db, "feeds", feedDoc.id, "comments", commentDoc.id, "replies"));
+        for (const replyDoc of repliesSnap.docs) {
+          const reply = replyDoc.data();
+          if (reply.uid === user.uid) {
+            const replyRef = doc(db, "feeds", feedDoc.id, "comments", commentDoc.id, "replies", replyDoc.id);
+            batch.update(replyRef, {
+              name: profileData.name,
+              profilePhotoURL: profileData.profilePhotoURL,
+            });
+          }
+        }
+      }
+    }
+
+    await batch.commit();
+
+    // 4️⃣ Hide UI + reload
+    document.getElementById("user-profile-editor").style.display = "none";
+    document.getElementById("overlay").style.display = "none";
+
+    if (typeof loadFeeds === "function") await loadFeeds();
+
+    alert("✅ Profile updated everywhere (posts, comments, replies)!");
+
+  } catch (err) {
+    console.error("❌ Failed to update everything:", err);
+    alert("❌ Error while updating posts/comments/replies.");
+  }
+};
+
+</script>
+
+
+</body>
+</html>
+<!-- Firebase Core SDKs -->
+
+    <script>
+function closeProfileEditor() {
+  document.getElementById("user-profile-editor").style.display = "none";
+}
+
+function sendBotMessage(response, chatbox) {
+    let botMessage = document.createElement("div");
+    botMessage.classList.add("bot-message");
+    botMessage.innerHTML = `<b>Sahu:</b> ${response}`;
+    chatbox.appendChild(botMessage);
+    chatbox.scrollTop = chatbox.scrollHeight;
+}
+
+let chatHistory = [
+  { role: "system", content: "You are Sahu AI, an assistant created by Revant Sahu. You are part of SahuPost, a mini LinkedIn built using JS, CSS, Firebase, and HTML. You help users sign in, complete their profiles, and more. You know that to sign in, users click the nav button, enter their name, email, and password, and optionally provide their bio, age, country, and website." }
+];
+
+
+async function sendMessage() {
+    let inputField = document.getElementById("user-input");
+    let input = inputField.value.trim();
+    let chatbox = document.getElementById("chat-box");
+
+    if (input === "") return;
+
+    // ✅ Append user's message to the chat history
+    chatHistory.push({ role: "user", content: input });
+
+    // ✅ Show User's Message
+    let userMessage = document.createElement("div");
+    userMessage.classList.add("user-message");
+    userMessage.innerHTML = `<b>You:</b> ${input}`;
+    chatbox.appendChild(userMessage);
+    inputField.value = "";
+
+    // ✅ Show loading animation
+    let loadingMsg = document.createElement("div");
+    loadingMsg.classList.add("bot-message", "loading");
+    loadingMsg.innerHTML = `<b>Sahu AI:</b> <span class="loader">⏳ thinking...</span>`;
+    chatbox.appendChild(loadingMsg);
+    chatbox.scrollTop = chatbox.scrollHeight;
+
+    // ✅ Fetch AI response
+    let aiResponse = await getAIResponse(chatHistory);
+
+    // ✅ Remove loading animation
+    loadingMsg.remove();
+
+    if (aiResponse) {
+        // ✅ Append assistant message to the history
+        chatHistory.push({ role: "assistant", content: aiResponse });
+
+        sendBotMessage(aiResponse, chatbox);
+    } else {
+        askUserToTeach(input, chatbox);
+    }
+}
+const estimateMaxTokens = (msg) => {
+  const text = String(msg || "").trim(); // ✅ convert safely
+
+  const length = text.length;
+
+  if (length < 50) return 128;
+  if (length < 150) return 256;
+  if (length < 500) return 512;
+  if (length < 1000) return 1024;
+  return 2048;
+};
+
+
+async function getAIResponse(userMessage) {
+    const API_KEY = "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"; 
+    const API_URL = "https://openrouter.ai/api/v1/chat/completions";
+    const ap = estimateMaxTokens(userMessage);
+    const requestBody = {
+    model: "mistralai/mistral-7b-instruct", // Choose a model
+messages: [
+  {
+    role: "system",
+content: `You are Sahu, the AI assistant for SahuPost — a web-based professional platform built by Revant using HTML, CSS, JavaScript, and Firebase.
+
+Your main job is to help users craft detailed, clean, and grammatically correct paragraphs for their feeds. Think of yourself as a friendly writing buddy — like Grammarly but cooler and more helpful for social/professional posts.
+
+You're chill, helpful, and never boring. You talk like a friend — warm and human — but still keep the message clean and useful. You can casually chat with users too.
+
+You respond using only HTML elements like <div>, <strong>, <p>, <ul>, and <li>. Structure matters, no markdown or plain text.
+
+You're never too wordy. Be short, punchy, and relevant — unless asked to go deeper. Keep things structured and clean.
+
+You're not just a bot. You're the friendly writing wingman of SahuPost. ✨
+`
+},
+  {
+    role: "user",
+    content: userMessage
+  }
+],
+max_tokens: ap,
+    };
+
+
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${API_KEY}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(requestBody)
+        });
+
+        const data = await response.json();
+        return data.choices[0].message.content; // Extract AI response
+
+    } catch (error) {
+        console.error("Error fetching AI response:", error);
+        return "Oops! Something went wrong. 😢";
+    }
+}
+
+// Handle Enter Key
+function handleKeyPress(event) {
+    if (event.key === "Enter") {
+        sendMessage();
+    }
+}
+    </script>
+    <script>
+function toggleSidebar() {
+  const sidebar = document.getElementById('apple');
+  const overlay = document.getElementById('overlay');
+
+  if (sidebar.classList.contains('open')) {
+    // Close sidebar
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
+
+    // After fade-out transition, hide the overlay completely
+    setTimeout(() => {
+      overlay.style.display = 'none';
+    }, 300); // must match CSS transition duration
+  } else {
+    // Open sidebar
+    sidebar.classList.add('open');
+    overlay.style.display = 'block'; // make it visible immediately
+
+    // Add fade-in class shortly after for smooth opacity transition
+    setTimeout(() => {
+      overlay.classList.add('show');
+    }, 10);
+  }
+}
+
+</script>

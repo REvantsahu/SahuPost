@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up | SahuPost</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    <link rel="icon" type="image/png" href="SahuPost logo.png">
+  <link rel="apple-touch-icon" href="SahuPost logo.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right,blue,white) no-repeat center center fixed;
+      color: black;
+      backdrop-filter: blur(150px);
+      -webkit-backdrop-filter: blur(150px);
+      background-size: cover;
+    }
+    .glass {
+      background: rgba(255, 255, 255, 0.555);
+      backdrop-filter: blur(150px);
+      -webkit-backdrop-filter: blur(150px);
+      border-radius: 2rem;
+      padding: 4rem;
+    }
+    /* Optional: Smooth progress animation */
+progress::-webkit-progress-bar {
+  background-color: #ccc;
+  border-radius: 1rem;
+}
+
+progress::-webkit-progress-value {
+  transition: width 0.3s ease-in-out;
+  border-radius: 1rem;
+}
+
+  </style>
+</head>
+<body class="flex justify-center items-center min-h-screen text-white font-sans">
+  <div class="glass w-full max-w-md">
+    <h2 class="text-2xl mb-4 text-center font-bold">Sign Up to SahuPost</h2>
+    <form id="signupForm" class="flex flex-col gap-3">
+      <input type="text" id="name" placeholder="Full Name" required class="p-2 rounded bg-white/20 placeholder-white focus:outline-none" />
+      <input type="email" id="email" placeholder="Email" required class="p-2 rounded bg-white/20 placeholder-white focus:outline-none" />
+      <input type="password" id="password" placeholder="Password" required class="p-2 rounded bg-white/20 placeholder-white focus:outline-none" />
+      <div class="flex items-center gap-2 text-sm mt-1">
+  <input type="checkbox" id="togglePassword" class="accent-blue-500" />
+  <label for="togglePassword" class="cursor-pointer" style="color: black;">Show Password</label>
+</div>
+
+
+<div id="toast" class="fixed bottom-5 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-4 py-2 rounded-md text-sm hidden z-50"></div>
+
+      <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded">Sign Up</button>
+      <button id="googleBtn" type="button" class="bg-white text-black p-2 rounded flex items-center justify-center gap-2">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" width="20" />
+        Continue with Google
+      </button>
+      <p id="error" class="text-red-300 text-sm text-center"></p>
+    </form>
+    <div id="loader" class="mt-4 hidden text-center">
+      <svg class="animate-spin h-6 w-6 mx-auto text-white" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="white" stroke-width="4"></circle>
+        <path class="opacity-75" fill="white" d="M4 12a8 8 0 018-8v8H4z" />
+      </svg>
+      <p class="text-sm mt-2">Signing up...</p>
+    </div>
+  </div>
+<div id="toast" class="fixed bottom-5 right-5 bg-green-600 text-white py-2 px-4 rounded hidden z-50">Upload complete ✅</div>
+
+<!-- Firebase App (modular SDK) -->
+<script type="module">
+  // Modular Firebase imports
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-auth.js";
+  import { getFirestore, doc, setDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
+  import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-storage.js";
+
+  // Firebase config
+  const firebaseConfig = {
+    apiKey: "AIzaSyD3ccBgd7d4RA2On9G6qJ0bWuH9JHtgCTc",
+    authDomain: "sahupost-92d1a.firebaseapp.com",
+    projectId: "sahupost-92d1a",
+    storageBucket: "sahupost-92d1a.appspot.com",  // ❗Fix: use .app**spot**.com
+    messagingSenderId: "1097651897779",
+    appId: "1:1097651897779:web:94888b6269c438e705f7c6"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+  const storage = getStorage(app);
+
+  // Element references
+  const signupForm = document.getElementById("signupForm");
+  const loader = document.getElementById("loader");
+  const errorText = document.getElementById("error");
+  const defaultPhotoURL = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBwgHBgkIBwgKCgkLDRYPDQwMDRsUFRAWIB0iIiAdHx8kKDQsJCYxJx8fLT0tMTU3Ojo6Iys/RD84QzQ5OjcBCgoKDQwNGg8PGjclHyU3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3Nzc3N//AABEIAJQAlAMBEQACEQEDEQH/xAAbAAEBAAMBAQEAAAAAAAAAAAAAAQUGBwIDBP/EADoQAAICAQIBCAYJAwUAAAAAAAABAgMEBREGEhMhMUFRcZEiUmGBwdEUI0JicnOhseEVJFMHJjU2kv/EABoBAQEAAwEBAAAAAAAAAAAAAAABBAUGAwL/xAAxEQEAAQMCBAQEBQUBAAAAAAAAAQIDBAUREiExURMyQXE0gbHRFCJCYeEzkaHB8CP/2gAMAwEAAhEDEQA/AO4gAAAAAA+GXk04tErsiahXHrkz6ooqrq4aerzu3aLVHHXO0NQ1Li2+xuGnw5mH+Sa3k/d1I21nTqY53J3c3k63cq5WI2jv6sDkZ2XkS3vybp+M3t5GdRaop8tMNTcyL1yd66pn5vhGycHvCcovvjJo9JpiY5viKpjpOzIYXEGp4clycmVsF9i30k/f1mPcw7NzrG3szbGo5NmeVW8dp5tu0TiPG1JqmyPM5HZBvdS8H8DU5GFXZ5xzh0GFqdvI/JPKpnE9zDbRQAAAAAAAAAAAA+d9sKa52WyUYQTcm+xFpiapiI6vmuuKKZqq6Q5zrerW6plct7xpi/q6+72v2nQ42PTZp29XFZ2bVl3N58sdIY0yWEBXlsKhQT2aa3TXSmutCVb5wnrb1Cl42TL+5rW+7+3Hv8e80Wdi+FVxU9JdVpef49Ph1+aP8/z3bGYDbgAAAAAAAAAAA1fjjOdWPVhwfTc+VP8ACtvj+xstOtRVXNc+jRa5kTTbizH6uvtDSzcuYAry2FQoBUA++nZk8DNpyq9965btd67V5HxdtxdomifV7Y96qxdpuR6Or1yU64zi94ySafsOW225O6iYmN4egoAAAAAAAAAAc/4zsc9clFvohVGK/f4m90+NrHvMuQ1mqasvbtEMGzOat5bCoUAIwqFVH1CB07hu126Fgyk93zSj5dHwOay42v1RHd2mn1TVi25nsyhjswAAAAAAAAAANA40qcNbc2uiyqMl7t18De6fVvZ27S5HWaJjK37xDANmc1aFAKjAhVQCPpKOo8OUunQ8GEls+aTa8en4nM5VXFfqmO7tcCiaMWiJ7MkY7LAAAAAAAAAADWeN8F3YcMyCblQ9pfhf87Gx067w1zRPq0mtY/Hai7H6fpLRjdOYCiBUKqCBCq/VpeFLUc+nEjvtZL0muyPa/I8r92LVua5e+NYm/dptx6/R1eEVGEYxWyS2Ry2+/N28RtG0PQUAAAAAAAAAAPFtcbYShZFSjJbNPtRYmYneHzVTFUTFXRzjiDRrNKyN0nLFm/q59e3sftOgxcqm9Tz6uOzsGrFr5c6Z6T/piWZbBQKhRGVVhCVk4whFylJ7JJbtsTMRG8rETM7R1dC4V0P+mUSuyEnlWr0vuLu+Zz2blePVtT5YdXpuD+Hp4qvNP+GwIwmzAAAAAAAAAAAAA+WRRVkVSqurjOuS2lGS3TLTVNM7x1fFdum5Tw1RvEtQ1Xg6abs0yxNf4rH1eD+ZtrGpR0ux84aDJ0WY52J+U/dr+RpGpY72twb1t2qPKXmjPoybNfSqGquYeRbnaqif+9nwjh5c3tDEyJPuVUvkek3bcfqj+7zps3Z6UT/aWSweFtUypLl0/R6+2Vr6fLrMa7n2aOk7+zNs6Xk3J5xwx+/2bhovD2Jpe1kU7cjttmuleC7DUZGZcv8AKeUdm/xNPtY3OOc92YS2MVnqAAAAAAAAAAAAE3AOSXWB452Hrx80XaeycUdznYP7cfNDaexxR3Odr9ePmicM9jihedr9eP8A6Rdp7HFHcVkX1ST8GTaTeJet+kKoAAAAAAAAAAAxGr6/h6WnGcnbd2VV7b+/uMmxiXL3OOUd2Bl6jZxuU857Q1LP4r1LJbVUoY8O6vpfmzbW9Ps0ebm0N7Vsm5ypnhj9vv8Aww92VkXNu7Iusb9exv8Acy6bdFPliIa+q7cq81Uz85fBxj3I9IefDHZOTHuRd14Y7JyY9y8hucNPZOTH1V5BeGOyxk4P0JOP4XsNt+r6jl0ftxNa1PDknRm3bL7M5OS8meFzFs3I50sm1mZFqfy1z8+f1bJpfG28o16nSl2c9Uuj3x+Rrr2metqflLbY+s78r0fOPs2/GyKcmmNtFsLK5LdSi90zVVU1UTw1RtLd0XKa6eKmd4fU+X2AAAAABG9gNU4n4jdEpYeny+t6rLV9j2L2mzw8Li/9LnT0hotS1PgmbVmefrPb+Wlyk5ScpNtt7tt7tm5iNo2hzkzvO8oUQojCoFQojCoURhUAyOjazk6RkKdEuVVJ/WVN+jL5P2mPk41F+narr3ZWLl3Merenp2dM0vUcfU8SGRjS3jLoafXF9z9pzl6zXZr4KnWWL9F+iK6Oj9h5PYAAAAGC4p1Z6dg8iqX9xduofdXbIzMLH8WveekNZqeZ+HtcNPmq6fdzxvd9Lb8ToHIoVUAhVQKFEYV5KAV5AgUKsMtwxrEtI1CLnJ/RrXybV3d0vcYmZjRft8usdPszcHK/D3N58s9fu6lCSlFNPdPqZzPu6yHoKAAAHMeIs152r32J71wfNw8F/O50eHai3ZiO/NxeoX/GyKqvSOUMYZTDQCMqoFCiMKjZRAqAQKhV2RgQqulcEag8zRY1Te9mM+bf4duj9P2Oc1Gz4d6ZjpPN0+l3/Ex4ietPJsRgNkAAPy6nf9GwMm9PprqlJeO3QelqjjuU095eORc8OzVX2hyjs6XuzqXCR+6BUKqACqgV5bKAV5YAKhVhADKPIVtf+nmQ4alk47fo2U8pL2xfyZqtWoibdNXaW30eva7VT3j6OhGidEAAMXxM3/Qs78pmRif16fdhaj8Jc9pcxOlcYFECoVUYVGyiBUYECoVUAFECvO5VbDwG/wDcUPyZ/A1+p/Dz7w2OlfEx7T/p005x04AAxXE//A535TMnD+Io92FqPwlz2cyOlcYgVAqFEYVCq8gAqFIQKFECoFRlGwcB/wDY6/ypmv1P4efeGx0v4mPaXTjnHTgADHcQVSv0bNrrW8pUy2Xh0nvjVRTepme7FzaJrxq6Y9Yly3r6uo6hxUc0IqMogVCiMKgEKqBQogVAqNlECtl/0/qlZr0rUvRqok2/FpI1uqVRFjbvLZaVTM5G/aHSjnnSgACNJ9aA5rxPo09Ly3ZXF/RLW3CS6ov1WdFh5UXqNp80f9u5HUMOce5vEflnp9mFM1r0bCoUQKgEKqBQsCBUKqNgQKsIysnGFcXOcntGKW7bJMxEbysRMztDqHCOivSNO+uS+k3NSs+73R9xzWdlePc/L0jo6jAxfw9vn1nqzxhM4AAAPnbTXdXKu2CnCS2cZLdMtMzTO8dXzVRTXHDVG8S0riXh3Bwq3fjc7Dfp5HK3j+q3/U3OHmXLk8NTn87T7NqJro3j6NSfWbZpHkKgAKhVRlECoAZVeQP26Th152VGm2U4xb23g1ueN+7NuiaoZGPai7XFMy6Xo2gadpUVZjVN3NdNtj5Uv49xzmRlXb3KqeXZ0uNiWrHOiOfdlkYrLUAB/9k=";
+
+  // Handle signup
+  signupForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errorText.textContent = "";
+    loader.classList.remove("hidden");
+
+    const name = signupForm.name.value.trim();
+    const email = signupForm.email.value.trim();
+    const password = signupForm.password.value;
+
+    if (!name || !email || !password ) {
+      errorText.textContent = "Please fill in all fields.";
+      loader.classList.add("hidden");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      errorText.textContent = "Please enter a valid email.";
+      loader.classList.add("hidden");
+      return;
+    }
+
+    if (password.length < 6 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+      errorText.textContent = "Password must be at least 6 characters long, with a number and uppercase letter.";
+      loader.classList.add("hidden");
+      return;
+    }
+
+    try {
+      const userCred = await createUserWithEmailAndPassword(auth, email, password);
+      await updateProfile(userCred.user, {
+        displayName: name,
+  profilePhotoURL: userCred.user.photoURL || defaultPhotoURL,
+      });
+
+
+await setDoc(doc(db, "users", userCred.user.uid), {
+  uid: userCred.user.uid,
+  name,
+  email,
+  profilePhotoURL: userCred.user.photoURL || defaultPhotoURL,
+  createdAt: serverTimestamp()
+});
+
+      window.location.href = "complete-profile.html";
+    } catch (err) {
+      const friendlyErrors = {
+  'auth/email-already-in-use': 'This email is already registered. Try signing in instead.',
+  'auth/invalid-email': 'Please enter a valid email address.',
+  'auth/weak-password': 'Password is too weak. Try a stronger one.',
+  'auth/user-not-found': 'No account found with this email.',
+  'auth/wrong-password': 'Incorrect password. Please try again.',
+  'storage/unauthorized': 'You don’t have permission to upload this file.',
+  'storage/canceled': 'Upload was canceled.',
+  'storage/unknown': 'An unknown error occurred during upload.',
+};
+
+const code = err.code || ''; // some Firebase errors use `err.code`
+const fallback = `Something went wrong (${code}). Please try again or contact support.`;
+errorText.textContent = friendlyErrors[code] || fallback;
+console.warn('Unhandled error:', err);
+
+      loader.classList.add("hidden");
+    }
+  });
+
+  // Password toggle
+  document.getElementById("togglePassword").addEventListener("change", function () {
+    const passwordInput = document.getElementById("password");
+    passwordInput.type = this.checked ? "text" : "password";
+  });
+
+  // Google Sign In
+  document.getElementById("googleBtn").addEventListener("click", async () => {
+    const provider = new GoogleAuthProvider();
+    try {
+      loader.classList.remove("hidden");
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (!userDoc.exists()) {
+        await setDoc(doc(db, "users", user.uid), {
+          uid: user.uid,
+          name: user.displayName,
+          email: user.email,
+          profilePhotoURL: defaultPhotoURL,
+          createdAt: serverTimestamp()
+        });
+      }
+
+      window.location.href = "complete-profile.html";
+    } catch (error) {
+      errorText.textContent = error.message;
+      loader.classList.add("hidden");
+    }
+  });
+</script>
+
+</body>
+</html>
