@@ -1969,15 +1969,14 @@ const estimateMaxTokens = (msg) => {
 
 
 async function getAIResponse(userMessage) {
-    const API_KEY = "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"; 
-    const API_URL = "https://openrouter.ai/api/v1/chat/completions";
-    const ap = estimateMaxTokens(userMessage);
-    const requestBody = {
-    model: "mistralai/mistral-7b-instruct", // Choose a model
-messages: [
-  {
-    role: "system",
-content: `You are Sahu, the AI assistant for SahuPost — a web-based professional platform built by Revant using HTML, CSS, JavaScript, and Firebase.
+  const ap = estimateMaxTokens(userMessage);
+
+  const requestBody = {
+    model: "mistralai/mistral-7b-instruct",
+    messages: [
+      {
+        role: "system",
+        content: `You are Sahu, the AI assistant for SahuPost — a web-based professional platform built by Revant using HTML, CSS, JavaScript, and Firebase.
 
 Your main job is to help users craft detailed, clean, and grammatically correct paragraphs for their feeds. Think of yourself as a friendly writing buddy — like Grammarly but cooler and more helpful for social/professional posts.
 
@@ -1987,35 +1986,31 @@ You respond using only HTML elements like <div>, <strong>, <p>, <ul>, and <li>. 
 
 You're never too wordy. Be short, punchy, and relevant — unless asked to go deeper. Keep things structured and clean.
 
-You're not just a bot. You're the friendly writing wingman of SahuPost. ✨
-`
-},
-  {
-    role: "user",
-    content: userMessage
+You're not just a bot. You're the friendly writing wingman of SahuPost. ✨`
+      },
+      {
+        role: "user",
+        content: userMessage
+      }
+    ],
+    max_tokens: ap
+  };
+
+  try {
+    const response = await fetch("/.netlify/functions/openrouter-proxy", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(requestBody)
+    });
+
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content || "No response received.";
+  } catch (error) {
+    console.error("Error fetching AI response from proxy:", error);
+    return "Oops! Something went wrong. 😢";
   }
-],
-max_tokens: ap,
-    };
-
-
-    try {
-        const response = await fetch(API_URL, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${API_KEY}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(requestBody)
-        });
-
-        const data = await response.json();
-        return data.choices[0].message.content; // Extract AI response
-
-    } catch (error) {
-        console.error("Error fetching AI response:", error);
-        return "Oops! Something went wrong. 😢";
-    }
 }
 
 // Handle Enter Key
