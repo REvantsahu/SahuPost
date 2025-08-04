@@ -80,6 +80,14 @@ header h1 {
   letter-spacing: 1px;
 }
 
+  .logo {
+    position: fixed;
+    left: 10px;
+    top: 20px;
+    height: 60px;
+    border-radius: 50%;
+  }
+
 nav {
   float: right;
   display: flex;
@@ -223,7 +231,7 @@ footer {
 /* Hamburger */
 .hamburger {
   display: none;
-  font-size: 2rem;
+
   background: none;
   
   border: none;
@@ -275,6 +283,10 @@ nav {
 
   .hamburger {
     display: block;
+    left: 7px;
+    top: 10px;
+    height: 80px;
+    position: fixed;
   }
 
   #nav-menu {
@@ -282,7 +294,7 @@ nav {
     flex-direction: column;
     align-items: center;
     gap: 14px;
-    background: linear-gradient(135deg, #6b11cbb6 0%, #2574fc88 100%);
+    background: linear-gradient(135deg, #6b11cb25 0%, #2574fc1e 100%);
     position: absolute;
     top: 100%;
     right: 0;
@@ -327,6 +339,7 @@ nav {
   z-index: 1000;
   transition: all 0.3s ease;
 }
+
 
 .theme-toggle:hover {
   background-color: #0105ff;
@@ -556,12 +569,14 @@ body.dark-mode {
 <body class="fade-in">
 <header>
   <div class="container">
+     
     <h1>SahuPost</h1>
 
     <button id="menu-btn" class="hamburger" aria-label="Toggle navigation">
-      &#9776;
-    </button>
+        <img src="SahuPost logo.png" alt="SahuPost Logo" class="logo">
 
+    </button>
+   
     <nav id="nav-menu">
       <a href="#features">Features</a>
       <a href="#demo">Demo</a>

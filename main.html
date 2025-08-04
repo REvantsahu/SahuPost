@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>SahuPost - Main</title>
     <link rel="icon" type="image/png" href="SahuPost logo.png">
   <link rel="apple-touch-icon" href="SahuPost logo.png">
@@ -17,6 +19,7 @@
   position: fixed;
   top: 25px;
   left: 15px;
+  display: none;
   z-index: 10000;
   background: linear-gradient(135deg, #8e2de2, #4a00e0);
   color: white;
@@ -83,17 +86,16 @@
   }
 
   .left-sidebar {
-     position: fixed;
+  
   top: 0;
-  left: -100%;
+
   width: 85%;
   max-width: 320px;
   height: 100vh;
 
   backdrop-filter: blur(10px);
   box-shadow: 2px 0 15px rgba(0, 0, 0, 0.5);
-  transition: left 0.3s ease;
-  z-index: 99999999999999999999999999999999999999999999999999999999999999999999999999999999999999;
+
   overflow-y: auto;
   padding: 20px;
   border-right: 1px solid #444;
@@ -323,7 +325,32 @@
       transform: translateY(-8px);
     }
   }
-@media screen and (max-width: 768px) {
+  /* Desktop layout */
+.container {
+  display: flex;
+}
+
+/* For screens less than 768px wide */
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column; /* Stack everything */
+  }
+
+  .user-list {
+    order: 3; /* Move user list below chat if needed */
+    display: none; /* Or hide if too tight */
+  }
+  #x {
+    display: block;
+  }
+  .profile-slider {
+    order: 1;
+  }
+
+  .chat-feed {
+    order: 2;
+  }
+
   * {
     box-sizing: border-box;
   }
@@ -335,7 +362,11 @@
     color: #ffffff;
     font-family: 'Segoe UI', sans-serif;
   }
-
+  #sidebar-toggle-btn{
+    display: block;
+     top: 6px;
+  left: 15px;
+  }
   .header {
     background-color: #1c1c1e;
     padding: 15px;
@@ -425,7 +456,12 @@ button {
     cursor: pointer;
     margin-top: 10px;
   }
-
+  .left-sidebar{
+      left: -100%;
+        transition: left 0.3s ease;
+       position: fixed;
+    z-index: 99999999999999999999999999999999999999999999999999999999999999999999999999999999999999;
+  }
   .feed-input {
     display: flex;
     flex-direction: column;
@@ -676,7 +712,7 @@ body.light-mode ::-webkit-scrollbar-thumb:hover {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  z-index: 99999;
+  z-index: 999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999999;
   color: white;
   font-family: 'Segoe UI', sans-serif;
   transition: background 0.3s ease;
@@ -733,10 +769,7 @@ body.light-mode .loader-ring {
   <img src="SahuPost logo.png" alt="SahuPost Logo" class="logo">
   <h1 style=" position: relative;
     left: 53px;">SahuPost</h1>
-  <button onclick="toggleTheme()" style="position:fixed; top:10px; right:10px; z-index:9999;justify-self: right; background: linear-gradient(to left,rgb(132, 0, 255),rgba(0, 0, 255, 0.562));color:white; border: none; font-size: 20px; cursor: pointer; padding: 10px; border-radius: 10%; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-    <span id="theme-icon">🌗 dark - mode</span>  <!-- Default icon for light theme -->
-   Toggle Theme
-</button>
+
 
 </header>
 <div id="loader" class="sahu-loader">
@@ -750,7 +783,7 @@ body.light-mode .loader-ring {
     <div class="user-profile">
     <button id="x" onclick="toggleSidebar()" style="
   position: absolute; top: 10px; right: 10px;
-  background: transparent; color: white;
+  background: transparent; color: white;display: none;
   border: none; font-size: 22px; cursor: pointer;">❌</button>
 
       <div id="my-profile"  class="my-profile" style="text-align: center; margin-bottom: 10px;">
@@ -771,6 +804,9 @@ body.light-mode .loader-ring {
   transition: 0.2s;
 ">
   🚪 Sign Out
+</button>  <button onclick="toggleTheme()" style=" top:10px; right:10px; z-index:9999;justify-self: right; background: linear-gradient(to left,rgb(132, 0, 255),rgba(0, 0, 255, 0.562));color:white; border: none; font-size: 20px; cursor: pointer; padding: 10px; border-radius: 10%; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
+    <span id="theme-icon">🌗 dark - mode</span>  <!-- Default icon for light theme -->
+   Toggle Theme
 </button>
 
     </div>
@@ -1514,7 +1550,7 @@ window.signOutUser = async function () {
     await signOut(auth);
     localStorage.clear();
     alert("👋 Signed out successfully!");
-    window.location.href = "/"; // or wherever your login/landing page is
+    window.location.href = "/index.html"; // or wherever your login/landing page is
   } catch (err) {
     console.error("❌ Sign-out error:", err);
     alert("Failed to sign out. Try again.");
@@ -1933,7 +1969,7 @@ const estimateMaxTokens = (msg) => {
 
 
 async function getAIResponse(userMessage) {
-    const API_KEY = "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"; 
+    const API_KEY = "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"; 
     const API_URL = "https://openrouter.ai/api/v1/chat/completions";
     const ap = estimateMaxTokens(userMessage);
     const requestBody = {
@@ -2014,5 +2050,18 @@ function toggleSidebar() {
     }, 10);
   }
 }
+// Close sidebar if clicked outside
+document.getElementById('overlay').addEventListener('click', function () {
+  const sidebar = document.getElementById('apple');
+  const overlay = document.getElementById('overlay');
+
+  if (sidebar.classList.contains('open')) {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('show');
+    setTimeout(() => {
+      overlay.style.display = 'none';
+    }, 300);
+  }
+});
 
 </script>
