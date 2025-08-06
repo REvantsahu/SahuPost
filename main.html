@@ -448,6 +448,8 @@ button {
 }
 .feed {
   width: 100%;
+  height: 100%;
+  overflow-y: auto;
 }
 
   .main-container {
@@ -1042,31 +1044,33 @@ body.light-mode #user-profile-editor h2 {
 </div>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+
   import {
     getAuth,
     onAuthStateChanged,
     signInWithEmailAndPassword,
-    createUserWithEmailAndPassword
-  } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
-import {
-  getFirestore,
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  deleteDoc,
-  collection,
-  getDocs,
-  addDoc,
-  query,
-  orderBy,
-  where ,
-   writeBatch
-} from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
- import { serverTimestamp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
-import { signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    createUserWithEmailAndPassword,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
+  import {
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc,
+    updateDoc,
+    deleteDoc,
+    collection,
+    getDocs,
+    addDoc,
+    query,
+    orderBy,
+    where,
+    writeBatch,
+    serverTimestamp,
+    getCountFromServer
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   // ✅ Firebase Config
   const firebaseConfig = {
@@ -1192,11 +1196,14 @@ async function loadFeeds() {
   const q = query(collection(db, "feeds"), orderBy("timestamp", "desc"));
   const snap = await getDocs(q);
   feedContainer.innerHTML = "";
+  snap.forEach(async docSnap => { // ⬅️ Made this function async
+  const feed = docSnap.data();
+  const postId = docSnap.id;
+  const likesCount = (feed.likes && feed.likes.length) || 0;
 
-  snap.forEach(docSnap => {
-    const feed = docSnap.data();
-    const postId = docSnap.id;
-    const likesCount = (feed.likes && feed.likes.length) || 0;
+  // 🆕 Comment count
+  const commentsCount = (await getCountFromServer(collection(db, "feeds", postId, "comments"))).data().count;
+
 
     const postEl = document.createElement("div");
     postEl.className = "feed-post";
@@ -1228,7 +1235,7 @@ async function loadFeeds() {
           border-radius: 20px;
           font-size: 14px;
           cursor: pointer;
-        ">💬 Comment</button>
+        ">💬 <span>${commentsCount} ${commentsCount === 1 ? 'Comment' : 'Comments'}</span></button>
       </div>
         ${isMyPost ? `
          <div style="display:flex; gap:15px; margin-top:20px;">
@@ -1396,6 +1403,7 @@ if (commentsDiv) commentsDiv.innerHTML = "";
     const comment = doc.data();
     const commentEl = document.createElement("div");
     commentEl.style = "margin-top:8px; padding:5px 10px; background:#292943; border-radius:6px;";
+const isMyComment = comment.uid === auth.currentUser?.uid;
 commentEl.innerHTML = `
   <div style="
     padding: 12px 14px;
@@ -1409,7 +1417,7 @@ commentEl.innerHTML = `
       <strong style="color: #fff;">${comment.name}</strong>
     </div>
 
-    <p style="margin-left: 42px; color: #ccc; font-size: 14px;">${comment.text}</p>
+    <p style="margin-left: 42px; color: #ccc; font-size: 14px;" id="comment-text-${doc.id}">${comment.text}</p>
 
     <div style="margin-left: 42px; margin-top: 8px;">
       <button onclick="showReplyInput('${postId}', '${doc.id}')" style="
@@ -1419,6 +1427,26 @@ commentEl.innerHTML = `
         cursor: pointer;
         font-size: 13px;
       ">💬 Reply</button>
+
+      ${isMyComment ? `
+        <button onclick="editComment('${postId}', '${doc.id}', \`${comment.text.replace(/`/g, "\\`")}\`)" style="
+          background: transparent;
+          color: orange;
+          border: none;
+          cursor: pointer;
+          font-size: 13px;
+          margin-left: 10px;
+        ">✏️ Edit</button>
+
+        <button onclick="deleteComment('${postId}', '${doc.id}')" style="
+          background: transparent;
+          color: red;
+          border: none;
+          cursor: pointer;
+          font-size: 13px;
+          margin-left: 6px;
+        ">🗑 Delete</button>
+      ` : ''}
 
       <div id="reply-box-${doc.id}" style="display:none; margin-top: 6px;">
         <textarea id="reply-input-${doc.id}" placeholder="Write a reply..." style="
@@ -1448,7 +1476,7 @@ commentEl.innerHTML = `
     </div>
   </div>
 `;
-  if( commentsDiv)commentsDiv.appendChild(commentEl);
+ if( commentsDiv)commentsDiv.appendChild(commentEl);
   if (checkIfLight()) {
   commentEl.style.background = "#eeeeff"; // outer wrap
   const box = commentEl.querySelector("div");
@@ -1483,9 +1511,15 @@ async function loadReplies(postId, commentId) {
     const reply = replyDoc.data();
     const replyEl = document.createElement("div");
     replyEl.style = "margin-left:20px; margin-top:6px; padding:4px 10px; background:#2a2a3a; border-radius:6px; font-size:13px;";
-    replyEl.innerHTML = `
-      <strong>${reply.name}</strong>: ${reply.text}
-    `;
+   const isMyReply = reply.uid === auth.currentUser?.uid;
+replyEl.innerHTML = `
+  <strong>${reply.name}</strong>: <span id="reply-text-${replyDoc.id}">${reply.text}</span>
+  ${isMyReply ? `
+    <button onclick="editReply('${postId}', '${commentId}', '${replyDoc.id}', \`${reply.text.replace(/`/g, "\\`")}\`)" style="margin-left: 10px; font-size: 12px; color: orange; background: none; border: none; cursor: pointer;">✏️</button>
+    <button onclick="deleteReply('${postId}', '${commentId}', '${replyDoc.id}')" style="margin-left: 5px; font-size: 12px; color: red; background: none; border: none; cursor: pointer;">🗑</button>
+  ` : ''}
+`;
+
     if (checkIfLight()) {
   replyEl.style.background = "#f4f4ff";
   replyEl.style.color = "#000";
@@ -1494,6 +1528,35 @@ async function loadReplies(postId, commentId) {
     if(repliesDiv)repliesDiv.appendChild(replyEl);
   });
 }
+window.deleteComment = async function(postId, commentId) {
+  await deleteDoc(doc(db, "feeds", postId, "comments", commentId));
+  loadComments(postId);
+};
+
+window.editComment = function(postId, commentId, oldText) {
+  const newText = prompt("Edit your comment:", oldText);
+  if (newText && newText.trim() !== "") {
+    updateDoc(doc(db, "feeds", postId, "comments", commentId), {
+      text: newText.trim()
+    });
+    document.getElementById(`comment-text-${commentId}`).innerText = newText;
+  }
+};
+
+window.deleteReply = async function(postId, commentId, replyId) {
+  await deleteDoc(doc(db, "feeds", postId, "comments", commentId, "replies", replyId));
+  loadReplies(postId, commentId);
+};
+
+window.editReply = function(postId, commentId, replyId, oldText) {
+  const newText = prompt("Edit your reply:", oldText);
+  if (newText && newText.trim() !== "") {
+    updateDoc(doc(db, "feeds", postId, "comments", commentId, "replies", replyId), {
+      text: newText.trim()
+    });
+    document.getElementById(`reply-text-${replyId}`).innerText = newText;
+  }
+};
 window.toggleCommentBox = function(postId) {
   const box = document.getElementById(`comment-box-${postId}`);
   const comBtn = document.getElementById(`com-${postId}`);
