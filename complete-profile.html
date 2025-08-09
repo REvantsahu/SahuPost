@@ -182,6 +182,11 @@ option {
         <input type="url" id="website" class="input-floating" placeholder=" " />
         <label for="website" class="label-floating">Website (Optional)</label>
       </div>
+      <div>
+  <h3 class="text-lg mb-2 font-semibold">Choose a Profile Picture</h3>
+  <div id="photoGrid" class="grid grid-cols-4 gap-4"></div>
+</div>
+
 <!-- Submit Button -->
 <button type="submit"
   class="w-full bg-purple-600 hover:bg-purple-700 active:bg-purple-800 text-white font-medium py-2 px-4 rounded-md shadow-md hover:shadow-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2">
@@ -294,6 +299,13 @@ countries.forEach(country => {
         return;
       }
 
+      if (!selectedPhoto) {
+  errorText.textContent = "Please select a profile picture.";
+  loader.classList.add("hidden");
+  return;
+}
+
+
       const bannedWords = ["idiot", "hate", "kill", "stupid"];
       for (const word of bannedWords) {
         if (bio.toLowerCase().includes(word)) {
@@ -308,13 +320,15 @@ countries.forEach(country => {
         if (!user) return;
 
         await db.collection("users").doc(user.uid).update({
-          age,
-          country,
-          bio,
-          website,
-          completedProfile: true,
-          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
+  age,
+  country,
+  bio,
+  website,
+  profilePhotoURL: selectedPhoto,
+  completedProfile: true,
+  updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+});
+
 
         window.location.href = "main.html";
       } catch (err) {
@@ -322,6 +336,37 @@ countries.forEach(country => {
         loader.classList.add("hidden");
       }
     });
+    const profilePhotos = [
+  "https://www.pngmart.com/files/22/User-Avatar-Profile-PNG.png",  
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTkS8v2vSpIzK2HCPWDdfZP3vbvQhEm5fxuwkNENSNSswbBoWScLb0h3GjVFqgZB9FEpSg&usqp=CAU",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQkfF6nBhidhIzL330CYtg70I8tpDBGJ2YjBPnE9D9gY0iLmGu563WBIab4KBexSDv7kG8&usqp=CAU",
+  "https://www.kindpng.com/picc/m/664-6643641_avatar-transparent-background-user-icon-hd-png-download.png",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRDtAJSO01-u8cV6hUbdBn1WIEqd1pQURT_WydQXKGejZqmk1U4UoKybT_llB0gcT6niYU&usqp=CAU",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTRgKkvkgQk4wH555z-fArrlYBw-TkAENpB7FYo3w6Mx1wXQAv0whmG_ZUlPsWNBWwfusY&usqp=CAU",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxQsKPal6ph5ZV8Q3Rw_-eqAwuDfXF33Hk988jGUMNN3oh12d2B7iMBWj8Ir_u9mWV1bs&usqp=CAU",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQlnP-QDvd3RxOcfELRjDluHdzwfKW1xxKHBrM9_dHUz5wxJbvMVko5vn1aQsMy4lmrIHk&usqp=CAU",
+  "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRV_1X-dUZ-fnJugYJxCZkRVZozc-p912TRASIwMUslJ-MEEjgKqhF9bd32-M7fykptZ18&usqp=CAU"
+];
+
+let selectedPhoto = null;
+const photoGrid = document.getElementById("photoGrid");
+
+profilePhotos.forEach((url, index) => {
+  const img = document.createElement("img");
+  img.src = url;
+  img.className = "w-16 h-16 rounded-full cursor-pointer border-2 border-transparent hover:border-purple-500 transition";
+  
+  img.onclick = () => {
+    selectedPhoto = url;
+    // Remove highlight from all
+    document.querySelectorAll("#photoGrid img").forEach(i => i.classList.remove("ring-4", "ring-purple-500"));
+    // Highlight selected
+    img.classList.add("ring-4", "ring-purple-500");
+  };
+
+  photoGrid.appendChild(img);
+});
+
   </script>
 </body>
 </html>

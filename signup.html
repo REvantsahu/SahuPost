@@ -142,7 +142,7 @@ await setDoc(doc(db, "users", userCred.user.uid), {
   uid: userCred.user.uid,
   name,
   email,
-  profilePhotoURL: userCred.user.photoURL || defaultPhotoURL,
+
   createdAt: serverTimestamp()
 });
 
@@ -188,7 +188,7 @@ console.warn('Unhandled error:', err);
           uid: user.uid,
           name: user.displayName,
           email: user.email,
-          profilePhotoURL: defaultPhotoURL,
+          
           createdAt: serverTimestamp()
         });
       }

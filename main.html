@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>SahuPost - Main</title>
-    <link rel="icon" type="image/png" href="SahuPost logo.png">
+  <link rel="icon" type="image/png" href="SahuPost logo.png">
   <link rel="apple-touch-icon" href="SahuPost logo.png">
+
 <style>
   body {
     margin: 0;
@@ -16,20 +17,21 @@
     background-attachment: fixed;
   }
 #sidebar-toggle-btn {
-  position: fixed;
-  top: 25px;
-  left: 15px;
+
   display: none;
   z-index: 10000;
   background: linear-gradient(135deg, #8e2de2, #4a00e0);
   color: white;
-  font-size: 24px;
+ 
   padding: 10px 14px;
   border: none;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(98, 0, 255, 0.6);
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  transition: transform 0.2s ease, ;
+    position: absolute; top: 10px; right: 10px;
+ display: none;
+ ; font-size: 22px; cursor: pointer;
 }
 
 #sidebar-toggle-btn:hover {
@@ -37,6 +39,36 @@
   box-shadow: 0 6px 20px rgba(98, 0, 255, 0.8);
 }
 
+.user-list,.feeds{
+    height: 100vh;
+  max-height: 100vh;
+  overflow-y: hidden;
+}
+.feed {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* fixed height for the entire section */
+}
+
+.expandable-wrapper {
+  flex: 1; /* fill remaining space after post input */
+  display: flex;
+  flex-direction: column;
+}
+
+.expandable-content {
+  flex: 1;
+  overflow-y: hidden; /* collapsed by default */
+  transition: max-height 0.3s ease;
+}
+
+.expandable-content.expanded {
+  overflow-y: auto; /* allow scrolling when expanded */
+}
+
+.toggle-btn {
+  flex-shrink: 0; /* always visible */
+}
 
   .profile-input {
     width: 100%;
@@ -96,30 +128,80 @@
     backdrop-filter: blur(6px);
   }
 
-  .left-sidebar {
-  
+.left-sidebar {
   top: 0;
-
   width: 85%;
   max-width: 320px;
-  height: 100%;
-
+  height: 100vh; /* full viewport height */
+  max-height: 100vh; /* prevent overflow beyond screen */
   backdrop-filter: blur(10px);
- 
-  overflow-y: hidden;
+  overflow-y: auto;
   padding: 20px;
+  box-sizing: border-box;
+}
 
-  }
-  .left-sidebar.open {
+.right-sidebar {
+  margin-left: 15px;
+  width: 20%;
+
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+main.feed {
+  flex-grow: 1;
+  background: rgba(20, 20, 40, 0.25);
+  padding: 15px;
+
+  overflow-y: auto ;
+  border-radius: 10px;
+  backdrop-filter: blur(5px);
+  box-sizing: border-box;
+}
+
+.right-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* fixed height */
+  width: 20%;
+  margin-left: 15px;
+  box-sizing: border-box;
+}
+
+.expandable-wrapper {
+  flex: 1; /* fills remaining space after header */
+  display: flex;
+  flex-direction: column;
+}
+
+.expandable-content {
+  flex: 1;
+  overflow-y: hidden; /* collapsed by default */
+  transition: max-height 0.3s ease;
+}
+
+.expandable-content.expanded {
+  overflow-y: auto; /* scroll when expanded */
+}
+
+
+
+.left-sidebar.open {
   left: 0;
 }
  
-  .right-sidebar {
-    margin-left: 15px;
-    width: 20%;
-  }
+.expandable {
+  max-height: 100vh; /* collapsed state */
+  overflow-y: hidden; /* hide content overflow when collapsed */
+  transition: max-height 0.3s ease;
+}
 
-  .user-profile, .sahuai-box, .people-know, .user-list {
+.expandable.expanded {
+  max-height: none; /* expanded state allows full content */
+  overflow-y: auto; /* allow scrolling inside when expanded */
+}
+
+.user-profile, .sahuai-box, .people-know, .user-list {
     
     background: rgba(40, 20, 70, 0.2);
     padding: 10px;
@@ -127,13 +209,7 @@
     backdrop-filter: blur(5px);
   }
 
-  main.feed {
-    flex-grow: 1;
-    background: rgba(20, 20, 40, 0.25);
-    padding: 15px;
-    border-radius: 10px;
-    backdrop-filter: blur(5px);
-  }
+
 
 .post-input {
   margin-bottom: 30px;
@@ -288,7 +364,6 @@
   .chat-button {
     position: relative;
     bottom: 200px;
-    
     background: linear-gradient(135deg, #b700ff, #0072ff);
     color: white;
     border: 3px solid #ffffff;
@@ -301,6 +376,7 @@
     transition: all 0.3s ease;
     z-index: 1000;
   }
+
 .chat-button {
   bottom: 20px;
   right: 20px;
@@ -345,6 +421,7 @@
   .loading-animation .dot:nth-child(3) {
     animation-delay: 0.4s;
   }
+
 #user-profile-editor,
 #userProfileView {
   max-height: 90vh;
@@ -359,13 +436,50 @@
       transform: translateY(-8px);
     }
   }
-  /* Desktop layout */
+  
 .container {
   display: flex;
 }
 
+.left-sidebar,
+.right-sidebar {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; /* full height */
+}
+
+.expandable-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.expandable-content {
+  flex: 1;
+  overflow-y: auto;
+  transition: max-height 0.3s ease;
+}
+
+.expandable-content.expanded {
+  overflow-y: auto;
+}
+
+/* Mobile */
+@media (max-width: 1090px) {
+  
+  .right-sidebar {
+    height: 50vh;       /* exactly half screen */
+    max-height: 50vh;   /* fixed collapsed height */
+  }
+
+
+  .expandable-content.expanded {
+    max-height: none; /* expand to full height when toggled */
+  }
+}
+
 /* For screens less than 768px wide */
-@media (max-width: 768px) {
+@media (max-width: 1090px) {
   .container {
     flex-direction: column; /* Stack everything */
   }
@@ -441,10 +555,12 @@ button {
   flex-direction: column;
   padding: 10px;
 }
-.left-sidebar,
+
 .right-sidebar {
   width: 100%;
   margin: 0 0 15px 0;
+  max-height: 50%;
+  height: 50%;
 }
 .feed {
   width: 100%;
@@ -895,7 +1011,7 @@ body.light-mode #user-profile-editor h2 {
 
 <div class="container">
   <!-- Left Sidebar -->
-<aside  id="apple"  class="left-sidebar">
+<aside  id="apple"  class="left-sidebar ">
     <div class="user-profile">
     <button id="x" onclick="toggleSidebar()" style="
   position: absolute; top: 10px; right: 10px;
@@ -924,7 +1040,7 @@ body.light-mode #user-profile-editor h2 {
     <span id="theme-icon">🌗 dark - mode</span>  <!-- Default icon for light theme -->
    Toggle Theme
 </button>
-
+ 
     </div>
 
     <!-- SahuAI Chatbox -->
@@ -943,6 +1059,7 @@ body.light-mode #user-profile-editor h2 {
         </div>
       </div>
     </div>
+  
   </aside>
 
 
@@ -1016,7 +1133,7 @@ body.light-mode #user-profile-editor h2 {
 
 
   <!-- Main Feed Area -->
-  <main class="feed">
+  <main class="feed " id="feed">
     <div class="post-input">
    
       <h2 id="welcome" align="center"><strong>Welcome</strong> <span id="user-name"></span>😎</h2>
@@ -1024,23 +1141,33 @@ body.light-mode #user-profile-editor h2 {
       <button onclick="postFeed()">Post</button>
     </div>
 
-    <div class="feeds" id="feeds">
-      <!-- All feed posts will go here -->
+      <div class="expandable-wrapper">
+    <div class="expandable-content" id="feeds">
+      <!-- JS-generated posts go here -->
     </div>
 
+  </div>
   </main>
 
   <!-- Right Sidebar -->
-  <aside class="right-sidebar">
-    <div class="people-know">
-      <h4>People You May Know</h4>
-    </div>
-    <div class="user-list">
+<aside class="right-sidebar" id="rightSidebar">
+  <div class="people-know">
+    <h4>People You May Know</h4>
+  </div>
+
+  <div class="expandable-wrapper">
+    <div class="user-list expandable-content" id="rightSidebarContent">
       <!-- Other user profiles to view -->
     </div>
-  </aside>
+
+  </div>
+</aside>
 
 
+<div id="overlayer" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);z-index:999;">
+  <div id="overlayContent" style="max-width:900px;margin:40px auto;padding:20px;background:rgba(255,255,255,0.05);border-radius:12px;overflow-y:auto;max-height:80vh;color:white;">
+  </div>
+</div>
 </div>
 
 <script type="module">
@@ -1067,6 +1194,7 @@ body.light-mode #user-profile-editor h2 {
     query,
     orderBy,
     where,
+    limit,
     writeBatch,
     serverTimestamp,
     getCountFromServer
@@ -1192,18 +1320,44 @@ window.checkIfLight = function () {
 async function loadFeeds() {
   const feedContainer = document.getElementById("feeds");
   feedContainer.innerHTML = "Loading...";
-    const loader = document.getElementById('loader');
-  const q = query(collection(db, "feeds"), orderBy("timestamp", "desc"));
-  const snap = await getDocs(q);
+  const loader = document.getElementById('loader');
+
+  const currentUser = auth.currentUser;
+
+  // 🔹 Step 1: Get user's latest post (only 1)
+  let myPost = [];
+  if (currentUser) {
+    const myPostQuery = query(
+      collection(db, "feeds"),
+      where("uid", "==", currentUser.uid),
+      orderBy("timestamp", "desc"),
+      limit(1)
+    );
+    const mySnap = await getDocs(myPostQuery);
+    myPost = mySnap.docs;
+  }
+
+  // 🔹 Step 2: Get all posts ordered by latest
+  const allPostsQuery = query(
+    collection(db, "feeds"),
+    orderBy("timestamp", "desc")
+  );
+  const allSnap = await getDocs(allPostsQuery);
+
+  // 🔹 Step 3: Create final feed list with user's post first (only once)
+  const allPosts = allSnap.docs.filter(doc => !myPost.some(m => m.id === doc.id));
+  const finalFeed = [...myPost, ...allPosts];
+
   feedContainer.innerHTML = "";
-  snap.forEach(async docSnap => { // ⬅️ Made this function async
-  const feed = docSnap.data();
-  const postId = docSnap.id;
-  const likesCount = (feed.likes && feed.likes.length) || 0;
 
-  // 🆕 Comment count
-  const commentsCount = (await getCountFromServer(collection(db, "feeds", postId, "comments"))).data().count;
+  // 🔁 Step 4: Render posts
+  finalFeed.forEach(async docSnap => {
+    const feed = docSnap.data();
+    const postId = docSnap.id;
+    const likesCount = (feed.likes && feed.likes.length) || 0;
 
+    // 🔄 Comment Count
+    const commentsCount = (await getCountFromServer(collection(db, "feeds", postId, "comments"))).data().count;
 
     const postEl = document.createElement("div");
     postEl.className = "feed-post";
@@ -2037,6 +2191,11 @@ function sendBotMessage(response, chatbox) {
 let chatHistory = [
   { role: "system", content: "You are Sahu AI, an assistant created by Revant Sahu. You are part of SahuPost, a mini LinkedIn built using JS, CSS, Firebase, and HTML. You help users sign in, complete their profiles, and more. You know that to sign in, users click the nav button, enter their name, email, and password, and optionally provide their bio, age, country, and website." }
 ];
+function toggleExpand(id, btn) {
+  const el = document.getElementById(id);
+  el.classList.toggle('expanded');
+  btn.textContent = el.classList.contains('expanded') ? 'Show Less' : 'Show More';
+}
 
 
 async function sendMessage() {

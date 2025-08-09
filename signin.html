@@ -98,16 +98,41 @@
         await signInWithEmailAndPassword(auth, email, password);
         window.location.href = "main.html"; // Redirect after success
       } catch (error) {
-        if (error.code === "auth/invalid-email") {
-          errorEl.textContent = "Invalid email format.";
-        } else if (error.code === "auth/user-not-found") {
-          errorEl.textContent = "No user found with this email.";
-        } else if (error.code === "auth/wrong-password") {
-          errorEl.textContent = "Wrong password.";
-        } else {
-          errorEl.textContent = error.message;
-        }
-      }
+  let message;
+
+  switch (error.code) {
+    case "auth/invalid-email":
+      message = "❌ The email format is invalid. Please check and try again.";
+      break;
+
+    case "auth/user-not-found":
+      message = "🔍 No account found with this email address.";
+      break;
+
+    case "auth/wrong-password":
+      message = "🔑 The password you entered is incorrect.";
+      break;
+
+    case "auth/too-many-requests":
+      message = "⚠️ Too many failed login attempts. Please wait a few minutes before trying again.";
+      break;
+
+    case "auth/network-request-failed":
+      message = "🌐 Network error. Please check your internet connection.";
+      break;
+
+    case "auth/user-disabled":
+      message = "🚫 This account has been disabled. Contact support for help.";
+      break;
+
+    default:
+      message = `⚠️Something went wrong `; // fallback to Firebase's own message
+  }
+
+  errorEl.textContent = message;
+  errorEl.style.color = "red"; // make it clear
+}
+
     });
 
     // Google Sign-In
